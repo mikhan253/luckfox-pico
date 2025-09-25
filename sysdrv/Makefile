@@ -713,7 +713,7 @@ rootfs: $(ROOTFS_BUILD_ENV)
 		make -C $(SYSDRV_DIR) strip \
 	fi
 
-	pushd $(SYSDRV_DIR)/out;tar cf $(OUT_ROOTFS).tar $(OUT_ROOTFS);popd
+#	pushd $(SYSDRV_DIR)/out;tar cf $(OUT_ROOTFS).tar $(OUT_ROOTFS);popd
 	@# RK_PARTITION_FS_TYPE_CFG is defined outside of sysdrv,
 	@# so if defined RK_PARTITION_FS_TYPE_CFG, we ignore SYSDRV_ROOTFS_BUILD_TARGET
 	@test "$(ROOTFS_PART_SIZE)" = "FAIL" || \
