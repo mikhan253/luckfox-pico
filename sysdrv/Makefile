@@ -585,13 +585,13 @@ busybox_clean:
 
 buildroot_menuconfig:
 	@echo -e "$(C_GREEN) ==sysdrv== buildroot memnuconfig   $(C_NORMAL)"
-	$(MAKE) $(BUILDROOT_DEFCONFIG) -C $(BUILDROOT_DIR)/$(BUILDROOT_VER)
-	$(MAKE) menuconfig -C $(BUILDROOT_DIR)/$(BUILDROOT_VER)
+	$(MAKE) BR2_EXTERNAL=$(SYSDRV_DIR)/../br2-external $(BUILDROOT_DEFCONFIG) -C $(BUILDROOT_DIR)/$(BUILDROOT_VER)
+	$(MAKE) BR2_EXTERNAL=$(SYSDRV_DIR)/../br2-external menuconfig -C $(BUILDROOT_DIR)/$(BUILDROOT_VER)
 #	$(MAKE) source -C $(BUILDROOT_DIR)/$(BUILDROOT_VER)
 
 buildroot_savedefconfig:
 	@echo -e "$(C_GREEN) ==sysdrv== buildroot savedefconfig   $(C_NORMAL)"
-	$(MAKE) savedefconfig -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
+	$(MAKE) BR2_EXTERNAL=$(SYSDRV_DIR)/../br2-external savedefconfig -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
 
 buildroot_create:
 	@echo -e "$(C_GREEN) ==sysdrv== buildroot create   $(C_NORMAL)"
@@ -614,10 +614,10 @@ buildroot: prepare
 		cp ${BUSYBOX_PATCH_PATH}/0010-halt-Support-rebooting-with-arg.patch $(BUILDROOT_DIR)/$(BUILDROOT_VER)/package/busybox/ ;\
 	);
 
-	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) $(BUILDROOT_DEFCONFIG) -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
+	$(MAKE) BR2_EXTERNAL=$(SYSDRV_DIR)/../br2-external ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) $(BUILDROOT_DEFCONFIG) -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
 	$(SYSDRV_DIR)/tools/board/mirror_select/buildroot_mirror_select.sh $(BUILDROOT_DIR)/$(BUILDROOT_VER)/.config
-	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) source -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
-	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -j$(SYSDRV_JOBS) -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
+	$(MAKE) BR2_EXTERNAL=$(SYSDRV_DIR)/../br2-external ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) source -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
+	$(MAKE) BR2_EXTERNAL=$(SYSDRV_DIR)/../br2-external ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -j$(SYSDRV_JOBS) -C $(BUILDROOT_DIR)/$(BUILDROOT_VER) 
 
 ifeq ($(SYSDRV_BUILD_RAMDISK_FLAG),YES)
     tar xf $(SYSDRV_DIR)/tools/board/rootfs_script.tar -C $(BUILDROOT_DIR)/$(BUILDROOT_VER)/output/target

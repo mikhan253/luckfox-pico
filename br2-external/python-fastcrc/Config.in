@@ -1,0 +1,5 @@
+config BR2_PACKAGE_PYTHON_FASTCRC
+    bool "python-fastcrc"
+    help
+      Python fastcrc library (fast CRC calculations).
+      https://pypi.org/project/fastcrc/
