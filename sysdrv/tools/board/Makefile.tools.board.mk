@@ -1,19 +1,5 @@
 
-tools_board-builds: \
-		board-build-toolkits \
-		board-build-gdb \
-		board-build-eudev \
-		board-build-rndis \
-		board-build-adbd \
-		board-build-rk_ota \
-		board-build-rockchip_test \
-		board-build-e2fsprogs \
-		board-build-sysstat \
-		board-build-fio \
-		board-build-i2c_tools \
-		board-build-dosfstools \
-		board-build-exfatprogs \
-		board-build-mtd_utils
+tools_board-builds: 
 	@echo "build tools board done"
 
 tools_board-clean:
