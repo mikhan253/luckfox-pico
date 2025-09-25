@@ -521,9 +521,9 @@ rootfs_prepare: prepare
 	@echo -e "$(C_GREEN) ==sysdrv== prepare rootfs   $(C_NORMAL)"
 	rm -rf $(SYSDRV_DIR_OUT_ROOTFS)
 	mkdir -p $(SYSDRV_DIR_OUT_ROOTFS)
-	tar xf $(SYSDRV_DIR)/tools/board/rootfs_script.tar -C $(SYSDRV_DIR_OUT_ROOTFS)
-	tar xjf $(TOOLCHAIN_DIR)/$(TOOLCHAIN_RUNTIME_LIB)/$(TOOLCHAIN_RUNTIME_LIB_C) -C $(SYSDRV_DIR_OUT_ROOTFS)
-	pushd $(SYSDRV_DIR_OUT_ROOTFS)/lib/ ; mv -fv \
+#	tar xf $(SYSDRV_DIR)/tools/board/rootfs_script.tar -C $(SYSDRV_DIR_OUT_ROOTFS)
+#	tar xjf $(TOOLCHAIN_DIR)/$(TOOLCHAIN_RUNTIME_LIB)/$(TOOLCHAIN_RUNTIME_LIB_C) -C $(SYSDRV_DIR_OUT_ROOTFS)
+#	pushd $(SYSDRV_DIR_OUT_ROOTFS)/lib/ ; mv -fv \
 		libasan_preinit.o \
 		libasan.so* \
 		libtsan.so* \
