@@ -1,1 +1,1 @@
-source "$BR2_EXTERNAL_MIK_PATH/python-fastcrc/Config.in"
+source "$BR2_EXTERNAL_MIK_PATH/package/python-fastcrc/Config.in"
