@@ -83,6 +83,17 @@ export RK_UBOOT_DEFCONFIG=luckfox_rv1106_uboot_defconfig
 # Kernel defconfig
 export RK_KERNEL_DEFCONFIG=luckfox_rv1106_linux_defconfig
 
+
+export RK_ENABLE_EUDEV=n
+export RK_ENABLE_ADBD=n
+export RK_ENABLE_GDB=n
+export RK_ENABLE_WIFI=n
+export RK_ENABLE_ROCKCHIP_TEST=n
+export RK_ENABLE_MOTOR=n
+export RK_ENABLE_RNDIS=n
+export RK_ENABLE_OTA=n
+export RK_ENABLE_STRACE=n
+
 # Config sensor IQ files
 # RK_CAMERA_SENSOR_IQFILES format:
 #     "iqfile1 iqfile2 iqfile3 ..."
