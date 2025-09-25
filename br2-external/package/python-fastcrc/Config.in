@@ -1,5 +1,6 @@
 config BR2_PACKAGE_PYTHON_FASTCRC
     bool "python-fastcrc"
+    depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
     help
       Python fastcrc library (fast CRC calculations).
       https://pypi.org/project/fastcrc/
