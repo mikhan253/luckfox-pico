@@ -79,7 +79,7 @@ ifeq ($(BOOT_MEDIUM),spi_nor)
 ifeq ($(CHIP),rv1106)
 	$(MAKE) -C $(SYSDRV_DIR)/tools/board/idb_bootconfig
 endif
-#	@pushd $(SYSDRV_DIR_OUT_ROOTFS)/usr/bin; \
+	@pushd $(SYSDRV_DIR_OUT_ROOTFS)/usr/bin; \
 		rm -f nanddump nandwrite \
 			ubiattach ubiblock ubidetach ubiformat \
 			ubimkvol ubirename ubirmvol ubirsvol; \

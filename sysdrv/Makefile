@@ -705,13 +705,13 @@ drv_clean:
 ##########################################################################################
 rootfs: $(ROOTFS_BUILD_ENV)
 	@echo -e "$(C_GREEN) ==sysdrv== build rootfs  $(C_NORMAL)"
-	#@if [ "$(TARGET_ROOTFS)" = "custom" ]; then \
-	#	test -d $(SYSDRV_DIR)/tools/board/custom_rootfs || ( \
-	#		cp -r $(SYSDRV_DIR)/tools/board/custom_rootfs/ $(SYSDRV_DIR)/out/$(OUT_ROOTFS) ; \
-	#	); \
-	#else \
-	#	make -C $(SYSDRV_DIR) strip \
-	#fi
+#	@if [ "$(TARGET_ROOTFS)" = "custom" ]; then \
+		test -d $(SYSDRV_DIR)/tools/board/custom_rootfs || ( \
+			cp -r $(SYSDRV_DIR)/tools/board/custom_rootfs/ $(SYSDRV_DIR)/out/$(OUT_ROOTFS) ; \
+		); \
+	else \
+		make -C $(SYSDRV_DIR) strip \
+	fi
 
 	pushd $(SYSDRV_DIR)/out;tar cf $(OUT_ROOTFS).tar $(OUT_ROOTFS);popd
 	@# RK_PARTITION_FS_TYPE_CFG is defined outside of sysdrv,

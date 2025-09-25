@@ -856,7 +856,7 @@ function build_kernel() {
 function build_rootfs() {
 	check_config RK_BOOT_MEDIUM || return 0
 
-	make rootfs -C ${SDK_SYSDRV_DIR}
+	#make rootfs -C ${SDK_SYSDRV_DIR}
 
 	__LINK_DEFCONFIG_FROM_BOARD_CFG
 
