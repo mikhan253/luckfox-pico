@@ -1,4 +1,4 @@
-BR2_ARM=y
+BR2_arm=y
 BR2_CORTEX_A7=y
 BR2_PRIMARY_SITE="http://sources.buildroot.net"
 BR2_OPTIMIZE_2=y
