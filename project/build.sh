@@ -1507,30 +1507,30 @@ function __PACKAGE_ROOTFS() {
 		exit 0
 	fi
 
-	#if [ "$LF_TARGET_ROOTFS" == "buildroot" ] || [ "$LF_TARGET_ROOTFS" == "busybox" ]; then
-		#build_get_sdk_version
-		#cat >$RK_PROJECT_PACKAGE_ROOTFS_DIR/bin/sdkinfo <<EOF
+	if [ "$LF_TARGET_ROOTFS" == "buildroot" ] || [ "$LF_TARGET_ROOTFS" == "busybox" ]; then
+		build_get_sdk_version
+		cat >$RK_PROJECT_PACKAGE_ROOTFS_DIR/bin/sdkinfo <<EOF
 #!/bin/sh
-#echo Build Time:  $(date "+%Y-%m-%d-%T")
-#echo SDK Version: ${GLOBAL_SDK_VERSION}
-#EOF
-		#chmod a+x $RK_PROJECT_PACKAGE_ROOTFS_DIR/bin/sdkinfo
-		#__COPY_FILES $RK_PROJECT_PATH_APP/root $RK_PROJECT_PACKAGE_ROOTFS_DIR
-	#fi
-	#__COPY_FILES $RK_PROJECT_PATH_MEDIA/root $RK_PROJECT_PACKAGE_ROOTFS_DIR
-	#__COPY_FILES $SDK_ROOT_DIR/external $RK_PROJECT_PACKAGE_ROOTFS_DIR
+echo Build Time:  $(date "+%Y-%m-%d-%T")
+echo SDK Version: ${GLOBAL_SDK_VERSION}
+EOF
+		chmod a+x $RK_PROJECT_PACKAGE_ROOTFS_DIR/bin/sdkinfo
+		__COPY_FILES $RK_PROJECT_PATH_APP/root $RK_PROJECT_PACKAGE_ROOTFS_DIR
+	fi
+	__COPY_FILES $RK_PROJECT_PATH_MEDIA/root $RK_PROJECT_PACKAGE_ROOTFS_DIR
+	__COPY_FILES $SDK_ROOT_DIR/external $RK_PROJECT_PACKAGE_ROOTFS_DIR
 
-	#if [ -d "$RK_PROJECT_PACKAGE_ROOTFS_DIR/usr/share/iqfiles" ]; then
-	#	(
-	#		cd $RK_PROJECT_PACKAGE_ROOTFS_DIR/etc
-	#		ln -sf ../usr/share/iqfiles ./
-	#	)
-	#fi
+	if [ -d "$RK_PROJECT_PACKAGE_ROOTFS_DIR/usr/share/iqfiles" ]; then
+		(
+			cd $RK_PROJECT_PACKAGE_ROOTFS_DIR/etc
+			ln -sf ../usr/share/iqfiles ./
+		)
+	fi
 
-	#if [ -f $RK_PROJECT_FILE_ROOTFS_SCRIPT ]; then
-	#	chmod a+x $RK_PROJECT_FILE_ROOTFS_SCRIPT
-	#	cp -f $RK_PROJECT_FILE_ROOTFS_SCRIPT $RK_PROJECT_PACKAGE_ROOTFS_DIR/etc/init.d
-	#fi
+	if [ -f $RK_PROJECT_FILE_ROOTFS_SCRIPT ]; then
+		chmod a+x $RK_PROJECT_FILE_ROOTFS_SCRIPT
+		cp -f $RK_PROJECT_FILE_ROOTFS_SCRIPT $RK_PROJECT_PACKAGE_ROOTFS_DIR/etc/init.d
+	fi
 }
 
 function parse_partition_env() {
