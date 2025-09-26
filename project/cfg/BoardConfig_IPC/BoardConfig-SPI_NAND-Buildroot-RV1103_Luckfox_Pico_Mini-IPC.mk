@@ -46,7 +46,7 @@ export RK_PARTITION_CMD_IN_ENV="256K(env),256K@256K(idblock),512K(uboot),4M(boot
 #         AAAA ----------> partition name
 #         /BBBB/CCCC ----> partition mount point
 #         ext4 ----------> partition filesystem type
-export RK_PARTITION_FS_TYPE_CFG=rootfs@IGNORE@ubifs,datafs@/data@ubifs
+export RK_PARTITION_FS_TYPE_CFG=rootfs@IGNORE@ubifs,oem@/oem@ubifs
 
 # config filesystem compress (Just for squashfs or ubifs)
 # squashfs: lz4/lzo/lzma/xz/gzip, default xz
