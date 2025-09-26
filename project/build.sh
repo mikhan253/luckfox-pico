@@ -2508,9 +2508,9 @@ function build_firmware() {
 
 	__PACKAGE_ROOTFS
 	#__PACKAGE_OEM
-	echo JETZT MACH ICH DAS OEM
-	mkdir -p $RK_PROJECT_PACKAGE_ROOTFS_DIR/oem
-	build_mkimg oem $RK_PROJECT_PACKAGE_OEM_DIR
+	#echo JETZT MACH ICH DAS OEM
+	#mkdir -p $RK_PROJECT_PACKAGE_ROOTFS_DIR/oem
+	#build_mkimg oem $RK_PROJECT_PACKAGE_OEM_DIR
 	#__BUILD_ENABLE_COREDUMP_SCRIPT
 
 	__RUN_PRE_BUILD_OEM_SCRIPT
@@ -2544,10 +2544,10 @@ function build_firmware() {
 
 	# package a empty userdata parition image
 	mkdir -p $RK_PROJECT_PACKAGE_USERDATA_DIR
-	if [ "$RK_ENABLE_FASTBOOT" != "y" ]; then
-		__PACKAGE_USERDATA
-		__RUN_POST_BUILD_USERDATA_SCRIPT
-	fi
+	#if [ "$RK_ENABLE_FASTBOOT" != "y" ]; then
+	#	__PACKAGE_USERDATA
+	#	__RUN_POST_BUILD_USERDATA_SCRIPT
+	#fi
 	build_mkimg userdata $RK_PROJECT_PACKAGE_USERDATA_DIR
 
 	build_tftp_sd_update
