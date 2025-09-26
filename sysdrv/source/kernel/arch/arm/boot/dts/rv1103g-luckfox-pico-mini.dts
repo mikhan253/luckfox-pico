@@ -48,22 +48,45 @@
 
 /**********ETH**********/
 &gmac {
-	status = "disabled";
+	status = "okay";
 };
 
 /**********USB**********/
 &usbdrd_dwc3 {
 	status = "okay";
-	dr_mode = "peripheral";
+	dr_mode = "host";
 };
 
 /**********SPI**********/
 /* SPI0_M0 */
 &spi0 {
-	status = "disabled";
-	spidev@0 {
-		spi-max-frequency = <50000000>;
-	};
+    status = "okay";
+    pinctrl-0 = <&spi0m0_clk &spi0m0_mosi>;
+    spidev@0 {
+        status = "okay";
+        compatible = "rockchip,spidev";
+        spi-max-frequency = <50000000>;
+        reg = <0>;
+    };
+    fbtft@0 {
+        status = "disabled";
+    };
+};
+&pinctrl {
+    spi0 {
+        spi0m0_clk: spi0m0-clk {
+            rockchip,pins = <1 RK_PC1 4 &pcfg_pull_none>;
+        };
+        spi0m0_mosi: spi0m0-mosi {
+            rockchip,pins = <1 RK_PC2 6 &pcfg_pull_none>;
+        };
+        spi0m0_miso: spi0m0-miso {
+            rockchip,pins = <1 RK_PC3 6 &pcfg_pull_none>;
+        };
+        spi0m0_cs0: spi0m0-cs0 {
+            rockchip,pins = <1 RK_PC0 4 &pcfg_pull_none>;
+        };
+    };
 };
 
 /**********I2C**********/
