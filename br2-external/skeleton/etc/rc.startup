@@ -18,6 +18,5 @@ mount -a || echo "mount fehlgeschlagen!"
 echo "Starte WiFi..."
 modprobe r8723bs
 mount -t tmpfs tmpfs /var/lib/iwd/
-/lib/iwd
 
 echo ">>> rc.startup fertig."
