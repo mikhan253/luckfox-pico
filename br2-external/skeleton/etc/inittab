@@ -1,0 +1,4 @@
+::sysinit:/etc/rc.startup
+::askfirst:/bin/sh
+::shutdown:/etc/rc.shutdown
+::restart:/sbin/init

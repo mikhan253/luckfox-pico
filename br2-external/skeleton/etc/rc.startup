@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#Mount system
+echo Mount System-Filesystems...
+mount -t proc - /proc
+mount -t sysfs - /sys
+mount -t devtmpfs - /dev
+mkdir -p /dev/pts
+mount -t devpts - /dev/pts
+
