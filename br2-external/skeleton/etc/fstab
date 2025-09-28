@@ -1,0 +1,1 @@
+/dev/ubi1_0 /mnt/userdata ubifs rw,noatime,nodiratime 0 0
