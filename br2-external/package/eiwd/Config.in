@@ -1,0 +1,5 @@
+config BR2_PACKAGE_EIWD
+    bool "eiwd (iwd ohne D-Bus)"
+    select BR2_PACKAGE_ELL
+    help
+      Fork von iwd, der ohne D-Bus auskommt. https://github.com/illiliti/eiwd
