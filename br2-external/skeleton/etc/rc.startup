@@ -1,5 +1,4 @@
 #!/bin/sh
-sleep 0.5
 echo ">>> rc.startup gestartet."
 echo "Mount System-Filesystems..."
 mount -t proc   proc  /proc
