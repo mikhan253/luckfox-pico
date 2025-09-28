@@ -1,15 +1,30 @@
 #!/bin/sh
 
-echo Mount System-Filesystems...
-mount -t proc proc /proc
-mount -t sysfs sysfs /sys
+# Alle Ausgaben (stdout + stderr) direkt auf die Konsole umleiten
+exec > /dev/console 2>&1
+
+echo ">>> Starte rc.startup ..."
+
+echo ">>> Starte rc.startup ... (console)" > /dev/console
+echo ">>> Starte rc.startup ... (ttyFIQ0)" > /dev/ttyFIQ0
+
+
+
+# Debug-Ausgaben aktivieren (jeder Befehl wird angezeigt)
+set -x
+
+echo "Mount System-Filesystems..."
+mount -t proc   proc  /proc
+mount -t sysfs  sysfs /sys
 mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
-mount -t tmpfs tmpfs /run
-mount -t tmpfs tmpfs /tmp
+mount -t tmpfs  tmpfs /run
+mount -t tmpfs  tmpfs /tmp
 
-echo Attach UBI...
-ubiattach -m 5 /dev/ubi_ctrl
+echo "Attach UBI..."
+ubiattach -m 5 /dev/ubi_ctrl || echo "ubiattach fehlgeschlagen!"
 
-echo Mount Filesystems from fstab...
-mount -a
+echo "Mount Filesystems from fstab..."
+mount -a || echo "mount -a fehlgeschlagen!"
+
+echo ">>> rc.startup fertig."

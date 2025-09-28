@@ -10,7 +10,7 @@ EIWD_DEPENDENCIES = ell # oder andere Bibliotheken, die benötigt werden
 EIWD_CONF_OPTS = \
     --disable-manual-pages \
     --enable-external-ell \
-    --disable-dbus-policy --disable-systemd-service
+    --disable-dbus-policy --disable-systemd-service --disable-dbus
 
 # Falls du Optionen aus iwd übernehmen willst, kannst du Bedingungen prüfen:
 ifeq ($(BR2_PACKAGE_READLINE),y)
