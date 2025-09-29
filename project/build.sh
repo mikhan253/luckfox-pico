@@ -2526,7 +2526,7 @@ function build_firmware() {
 	#fi
 
 	__RUN_POST_BUILD_SCRIPT
-	post_overlay
+	#post_overlay
 
 	if [ -n "$GLOBAL_INITRAMFS_BOOT_NAME" ]; then
 		build_mkimg boot $RK_PROJECT_PACKAGE_ROOTFS_DIR
