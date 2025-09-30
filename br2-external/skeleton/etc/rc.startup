@@ -20,4 +20,12 @@ mount -t tmpfs tmpfs /var/lib/iwd/
 cp /etc/iwd/wifi/* /var/lib/iwd/
 touch /run/resolv.conf
 
+echo "Runit vorbereiten..."
+for service in /etc/sv/*; do
+    [ -d "$service" ] || continue
+    svc_name=$(basename "$service")
+    mkdir -p "/run/${svc_name}_supervise"
+    echo "Created /run/${svc_name}_supervise"
+done
+
 echo ">>> rc.startup fertig."
