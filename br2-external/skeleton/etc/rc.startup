@@ -20,6 +20,9 @@ mount -t tmpfs tmpfs /var/lib/iwd/
 cp /etc/iwd/wifi/* /var/lib/iwd/
 touch /run/resolv.conf
 
+echo "SSH vorbereiten..."
+ln -s /mnt/userdata/config/ssh /var/run/dropbear
+
 echo "Runit vorbereiten..."
 for service in /etc/sv/*; do
     [ -d "$service" ] || continue
