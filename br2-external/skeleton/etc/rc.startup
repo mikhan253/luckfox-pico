@@ -9,15 +9,16 @@ mount -t tmpfs  tmpfs /run
 mount -t tmpfs  tmpfs /tmp
 
 echo "Attach UBI..."
-ubiattach -m 5 /dev/ubi_ctrl || echo "ubiattach fehlgeschlagen!"
+ubiattach -m 5 /dev/ubi_ctrl
 
 echo "Mount Filesystems from fstab..."
-mount -a || echo "mount fehlgeschlagen!"
+mount -a
 
 echo "Starte WiFi..."
 modprobe r8723bs
 mount -t tmpfs tmpfs /var/lib/iwd/
 cp /etc/iwd/wifi/* /var/lib/iwd/
+touch /run/resolv.conf
 
 echo "Starte SSH..."
 
