@@ -1,25 +1,23 @@
 #!/bin/sh
 echo ">>> rc.startup gestartet."
-echo "Mount System-Filesystems..."
-mount -t proc   proc  /proc
-mount -t sysfs  sysfs /sys
+echo "Mounte System-Filesystems..."
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
 mkdir -p /dev/pts
 mount -t devpts devpts /dev/pts
-mount -t tmpfs  tmpfs /run
-mount -t tmpfs  tmpfs /tmp
+mount -t tmpfs tmpfs /run
+mount -t tmpfs tmpfs /tmp
 
 echo "Attach UBI..."
 ubiattach -m 5 /dev/ubi_ctrl
 
-echo "Mount Filesystems from fstab..."
+echo "Mounte Filesystems von fstab..."
 mount -a
 
-echo "Starte WiFi..."
+echo "WiFi vorbereiten..."
 modprobe r8723bs
 mount -t tmpfs tmpfs /var/lib/iwd/
 cp /etc/iwd/wifi/* /var/lib/iwd/
 touch /run/resolv.conf
-
-echo "Starte SSH..."
 
 echo ">>> rc.startup fertig."
