@@ -1,30 +1,29 @@
 #!/bin/sh
 echo ">>> rc.startup gestartet."
+CONFIGDATA=/mnt/userdata/config
 
-echo "Mounte System-Filesystems..."
-mkdir -p /dev/pts
-mkdir -p /dev/shm
+mount -t proc proc /proc
 
 echo "Attach UBI..."
 ubiattach -m 5 /dev/ubi_ctrl
 
 echo "Mounte Filesystems von fstab..."
+mkdir -p /dev/pts
+mkdir -p /dev/shm
 mount -a
 
 echo "Netzwerk vorbereiten..."
 touch /run/resolv.conf
-hostname -F /mnt/userdata/config/hostname
+hostname -F ${CONFIGDATA}/hostname
 
 echo "WiFi vorbereiten..."
 modprobe r8723bs
-for file in /etc/iwd/wifi/*; do
+mkdir /run/config_wifi
+for file in ${CONFIGDATA}/wifi/*; do
     if [ -f "$file" ]; then
         ln -s "$file" "/var/lib/iwd/$(basename "$file")"
     fi
 done
-
-echo "SSH vorbereiten..."
-ln -s /mnt/userdata/config/ssh /var/run/dropbear
 
 echo "Runit vorbereiten..."
 for service in /etc/sv/*; do

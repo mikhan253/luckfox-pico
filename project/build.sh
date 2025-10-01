@@ -45,7 +45,7 @@ UBOOT_PATH=${SDK_SYSDRV_DIR}/source/uboot/u-boot
 #for custom rootfs
 CUSTOM_ROOT=${SDK_ROOT_DIR}/custom_root
 
-export RK_JOBS=$(($(getconf _NPROCESSORS_ONLN) / 2 + 1))
+export RK_JOBS=$(($(getconf _NPROCESSORS_ONLN) + 1))
 export RK_BUILD_VERSION_TYPE=RELEASE
 
 export SDK_ROOT_DIR=$SDK_ROOT_DIR
@@ -2525,6 +2525,7 @@ function build_firmware() {
 	#	rm -rf $RK_PROJECT_PACKAGE_OEM_DIR
 	#fi
 
+	$SDK_ROOT_DIR/post_rootfs.sh $RK_PROJECT_PACKAGE_ROOTFS_DIR
 	__RUN_POST_BUILD_SCRIPT
 	#post_overlay
 
