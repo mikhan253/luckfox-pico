@@ -1,0 +1,22 @@
+#!/bin/sh
+CMD=$@
+DATA=$(cat)
+
+DOMAINNAME=$(grep search /etc/resolv.conf)
+NAMESERVER=$(grep nameserver /etc/resolv.conf)
+
+
+echo CMD=$CMD DATA=$DATA
+
+echo DOMAINNAME=$DOMAINNAME   NAMESERVER=$NAMESERVER
+
+case "$CMD" in
+ *.dns*)
+  NAMESERVER=$DATA
+  ;;
+ *.domain*)
+  DOMAINNAME=$DATA
+  ;;
+esac
+
+echo -e "$NAMESERVER\n$DOMAINNAME" > /etc/resolv.conf
