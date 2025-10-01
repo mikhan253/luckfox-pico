@@ -1,12 +1,9 @@
 #!/bin/sh
 echo ">>> rc.startup gestartet."
+
 echo "Mounte System-Filesystems..."
-mount -t proc proc /proc
-mount -t sysfs sysfs /sys
 mkdir -p /dev/pts
-mount -t devpts devpts /dev/pts
-mount -t tmpfs tmpfs /run
-mount -t tmpfs tmpfs /tmp
+mkdir -p /dev/shm
 
 echo "Attach UBI..."
 ubiattach -m 5 /dev/ubi_ctrl
@@ -14,11 +11,17 @@ ubiattach -m 5 /dev/ubi_ctrl
 echo "Mounte Filesystems von fstab..."
 mount -a
 
+echo "Netzwerk vorbereiten..."
+touch /run/resolv.conf
+hostname -F /mnt/userdata/config/hostname
+
 echo "WiFi vorbereiten..."
 modprobe r8723bs
-mount -t tmpfs tmpfs /var/lib/iwd/
-cp /etc/iwd/wifi/* /var/lib/iwd/
-touch /run/resolv.conf
+for file in /etc/iwd/wifi/*; do
+    if [ -f "$file" ]; then
+        ln -s "$file" "/var/lib/iwd/$(basename "$file")"
+    fi
+done
 
 echo "SSH vorbereiten..."
 ln -s /mnt/userdata/config/ssh /var/run/dropbear
