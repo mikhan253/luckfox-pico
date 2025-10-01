@@ -3,6 +3,7 @@ echo ">>> rc.startup gestartet."
 CONFIGDATA=/mnt/userdata/config
 
 mount -t proc proc /proc
+mount -o remount,size=128k /dev
 
 echo "Attach UBI..."
 ubiattach -m 5 /dev/ubi_ctrl
