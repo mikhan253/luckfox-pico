@@ -14,3 +14,4 @@ case "$CMD" in
 esac
 
 echo -e "$NAMESERVER\n$DOMAINNAME" > /etc/resolv.conf
+
