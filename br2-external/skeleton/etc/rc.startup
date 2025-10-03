@@ -26,6 +26,14 @@ for file in ${CONFIGDATA}/wifi/*; do
     fi
 done
 
+echo "Cron vorbereiten..."
+mkdir /run/crontabs
+for file in ${CONFIGDATA}/cron/*; do
+    if [ -f "$file" ]; then
+        ln -s "$file" "/run/crontabs/$(basename "$file")"
+    fi
+done
+
 echo "Runit vorbereiten..."
 for service in /etc/sv/*; do
     [ -d "$service" ] || continue
