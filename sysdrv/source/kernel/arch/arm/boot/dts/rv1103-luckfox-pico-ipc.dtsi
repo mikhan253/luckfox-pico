@@ -120,24 +120,6 @@
 			reg = <0>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-
-			csi_dphy_input0: endpoint@0 {
-				reg = <0>;
-				remote-endpoint = <&sc3336_out>;
-				data-lanes = <1 2>;
-			};
-
-			csi_dphy_input1: endpoint@1 {
-				reg = <1>;
-				remote-endpoint = <&sc4336_out>;
-				data-lanes = <1 2>;
-			};
-
-			csi_dphy_input2: endpoint@2 {
-				reg = <2>;
-				remote-endpoint = <&sc530ai_out>;
-				data-lanes = <1 2>;
-			};
 		};
 
 		port@1 {
