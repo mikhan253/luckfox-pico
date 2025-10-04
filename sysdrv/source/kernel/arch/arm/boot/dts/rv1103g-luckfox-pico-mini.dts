@@ -10,8 +10,8 @@
 #include "rv1103-luckfox-pico-ipc.dtsi"
 
 / {
-	model = "Luckfox Pico Mini";
-	compatible = "rockchip,rv1103g-38x38-ipc-v10", "rockchip,rv1103";
+    model = "Luckfox Pico Mini";
+    compatible = "rockchip,rv1103g-38x38-ipc-v10", "rockchip,rv1103";
 };
 
 /**********SFC**********/
@@ -111,4 +111,25 @@
 /* PWM1_M0 */
 &pwm1 {
 	status = "disabled";
+};
+
+
+/**********OTHER**********/
+&crypto {
+	status = "okay";
+};
+&rng {
+	status = "okay";
+};
+&hw_decompress {
+	status = "okay";
+};
+&wdt {
+	status = "okay";
+};
+&mailbox {
+	status = "okay";
+};
+&npu {
+	status = "okay";
 };
