@@ -61,7 +61,7 @@
 /* SPI0_M0 */
 &spi0 {
     status = "okay";
-    pinctrl-0 = <&spi0m0_clk &spi0m0_mosi>;
+    pinctrl-0 = <&spi0m0_clk &spi0m0_mosi &spi0m0_miso &spi0m0_cs0>;
     spidev@0 {
         status = "okay";
         compatible = "rockchip,spidev";
