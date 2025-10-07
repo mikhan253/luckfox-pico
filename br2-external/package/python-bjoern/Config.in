@@ -1,0 +1,7 @@
+config BR2_PACKAGE_PYTHON_BJOERN
+    bool "python-bjoern"
+    depends on BR2_PACKAGE_PYTHON3
+    select BR2_PACKAGE_LIBEV
+    help
+      bjoern is a fast HTTP server for Python using C extensions.
+      Version 3.2.2
