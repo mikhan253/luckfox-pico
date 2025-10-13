@@ -87,7 +87,6 @@ export RK_KERNEL_DEFCONFIG=luckfox_rv1106_linux_defconfig
 export RK_ENABLE_EUDEV=n
 export RK_ENABLE_ADBD=n
 export RK_ENABLE_GDB=n
-export RK_ENABLE_WIFI=n
 export RK_ENABLE_ROCKCHIP_TEST=n
 export RK_ENABLE_MOTOR=n
 export RK_ENABLE_RNDIS=n
@@ -115,7 +114,7 @@ export RK_ENABLE_STRACE=n
 #export RK_ENABLE_ROCKCHIP_TEST=y
 
 # enable rockchip wifi
-#export RK_ENABLE_WIFI=y
+export RK_ENABLE_WIFI=y
 
 # config wifi ssid and passwd
 #export LF_WIFI_SSID="Your wifi ssid"
