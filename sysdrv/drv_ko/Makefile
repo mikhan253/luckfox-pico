@@ -21,7 +21,7 @@ M_DIRS := wifi
 all:
 	@mkdir -p $(CURRENT_DIR)/$(PKG_BIN);
 	@$(foreach target,$(M_DIRS), test ! -f $(target)/Makefile || make -C $(target) || exit $$?;)
-	@cp insmod_ko.sh $(CURRENT_DIR)/$(PKG_BIN);
+	#@cp insmod_ko.sh $(CURRENT_DIR)/$(PKG_BIN);
 	$(call MAROC_COPY_PKG_TO_SYSDRV_OUTPUT, $(KERNEL_DRV_KO_INSTALL_PATH), $(CURRENT_DIR)/$(PKG_BIN))
 
 distclean: clean
