@@ -177,7 +177,8 @@ echo-cmd = $(if $($(quiet)cmd_$(1)),\
 # sink stdout for 'make -s'
        redirect :=
  quiet_redirect :=
-silent_redirect := exec >/dev/null;
+silent_redirect :=
+#silent_redirect := exec >/dev/null;
 
 # Delete the target on interruption
 #

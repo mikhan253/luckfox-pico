@@ -117,8 +117,7 @@ typedef struct _RT_8192F_FIRMWARE_HDR {
  * NS offload: 2 NDP info: 1
  */
 #ifdef CONFIG_WOWLAN
-	/* 7 pages for wow rsvd page + 2 pages for pattern */
-	#define WOWLAN_PAGE_NUM_8192F	0x09
+	#define WOWLAN_PAGE_NUM_8192F	0x07
 #else
 	#define WOWLAN_PAGE_NUM_8192F	0x00
 #endif

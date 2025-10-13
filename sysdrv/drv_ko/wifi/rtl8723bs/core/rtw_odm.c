@@ -178,9 +178,24 @@ void rtw_odm_releasespinlock(_adapter *adapter,	enum rt_spinlock_type type)
 	}
 }
 
-s16 rtw_odm_get_tx_power_mbm(struct dm_struct *dm, u8 rfpath, u8 rate, u8 bw, u8 cch)
+inline u8 rtw_odm_get_dfs_domain(struct dvobj_priv *dvobj)
 {
-	return phy_get_txpwr_single_mbm(dm->adapter, rfpath, mgn_rate_to_rs(rate), rate, bw, cch, 0, 0, NULL);
+#ifdef CONFIG_DFS_MASTER
+	struct dm_struct *pDM_Odm = dvobj_to_phydm(dvobj);
+
+	return pDM_Odm->dfs_region_domain;
+#else
+	return PHYDM_DFS_DOMAIN_UNKNOWN;
+#endif
+}
+
+inline u8 rtw_odm_dfs_domain_unknown(struct dvobj_priv *dvobj)
+{
+#ifdef CONFIG_DFS_MASTER
+	return rtw_odm_get_dfs_domain(dvobj) == PHYDM_DFS_DOMAIN_UNKNOWN;
+#else
+	return 1;
+#endif
 }
 
 #ifdef CONFIG_DFS_MASTER

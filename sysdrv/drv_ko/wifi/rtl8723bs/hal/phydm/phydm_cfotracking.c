@@ -249,9 +249,9 @@ phydm_set_crystal_cap_reg(void *dm_void, u8 crystal_cap)
 	}
 	#endif
 	#if (RTL8822B_SUPPORT || RTL8821C_SUPPORT || RTL8197F_SUPPORT ||\
-	     RTL8192F_SUPPORT || RTL8197G_SUPPORT || RTL8198F_SUPPORT)
+	     RTL8192F_SUPPORT || RTL8197G_SUPPORT)
 	else if (dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C |
-		 ODM_RTL8197F | ODM_RTL8192F | ODM_RTL8197G | ODM_RTL8198F)) {
+		 ODM_RTL8197F | ODM_RTL8192F | ODM_RTL8197G)) {
 		/* write 0x24[30:25] = 0x28[6:1] = crystal_cap */
 		odm_set_mac_reg(dm, R_0x24, 0x7e000000, crystal_cap);
 		odm_set_mac_reg(dm, R_0x28, 0x7e, crystal_cap);
@@ -347,14 +347,6 @@ void phydm_cfo_tracking_reset(void *dm_void)
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	if (dm->support_ic_type & ODM_IC_11N_SERIES)
 		phydm_set_atc_status(dm, true);
-#endif
-#endif
-#ifdef PHYDM_IC_JGR3_SERIES_SUPPORT
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE | ODM_AP))
-	if (dm->support_ic_type & ODM_RTL8814B) {
-		/*Disable advance time for CFO residual*/
-		odm_set_bb_reg(dm, R_0xc2c, BIT29, 0x0);
-	}
 #endif
 #endif
 }
@@ -506,14 +498,6 @@ void phydm_cfo_tracking(void *dm_void)
 			else
 				phydm_set_atc_status(dm, true);
 
-		}
-		#endif
-		#endif
-		#ifdef PHYDM_IC_JGR3_SERIES_SUPPORT
-		#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE | ODM_AP))
-		if (dm->support_ic_type & ODM_RTL8814B) {
-			//Disable advance time for CFO residual
-			odm_set_bb_reg(dm, R_0xc2c, BIT29, 0x0);
 		}
 		#endif
 		#endif

@@ -284,7 +284,6 @@ struct rm_obj {
 	u64 meas_end_time;
 	int wait_busy;
 	u8 poll_mode;
-	u8 free_run_counter_valid; /* valid:_SUCCESS/invalid:_FAIL */
 
 	struct data_buf buf[MAX_BUF_NUM];
 

@@ -20,7 +20,7 @@
  *	CONFIG_PLATFORM_ARM_SUN8I
  */
 #include <drv_types.h>
-#include <mach/sys_config.h>
+//#include <mach/sys_config.h>
 #ifdef CONFIG_GPIO_WAKEUP
 #include <linux/gpio.h>
 #endif

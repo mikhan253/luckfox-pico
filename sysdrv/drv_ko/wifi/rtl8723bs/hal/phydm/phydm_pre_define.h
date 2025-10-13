@@ -32,8 +32,8 @@
  * 1 ============================================================
  ***************************************************************/
 
-#define PHYDM_CODE_BASE			"PHYDM_V048_GIT"
-#define PHYDM_RELEASE_DATE		"20210331.0"
+#define PHYDM_CODE_BASE			"PHYDM_V039"
+#define PHYDM_RELEASE_DATE		"20190410.0"
 
 /*PHYDM API status*/
 #define	PHYDM_SET_FAIL			0
@@ -311,17 +311,6 @@ enum phydm_ctrl_info_rate {
 	ODM_RATEVHTSS4MCS9	= 0x53,
 };
 
-enum phydm_legacy_spec_rate {
-	PHYDM_SPEC_RATE_6M	= 0xb,
-	PHYDM_SPEC_RATE_9M	= 0xf,
-	PHYDM_SPEC_RATE_12M	= 0xa,
-	PHYDM_SPEC_RATE_18M	= 0xe,
-	PHYDM_SPEC_RATE_24M	= 0x9,
-	PHYDM_SPEC_RATE_36M	= 0xd,
-	PHYDM_SPEC_RATE_48M	= 0x8,
-	PHYDM_SPEC_RATE_54M	= 0xc
-};
-
 #define NUM_RATE_AC_4SS (ODM_RATEVHTSS4MCS9 + 1)
 #define NUM_RATE_AC_3SS (ODM_RATEVHTSS3MCS9 + 1)
 #define NUM_RATE_AC_2SS (ODM_RATEVHTSS2MCS9 + 1)
@@ -496,15 +485,6 @@ enum phydm_ic {
 			    ODM_RTL8198F | ODM_RTL8812F | ODM_RTL8814B |\
 			    ODM_RTL8197G | ODM_RTL8721D | ODM_RTL8710C)
 
-/* fw offload ability*/
-#define PHYDM_IC_SUPPORT_FW_PARAM_OFFLOAD (ODM_RTL8814A | ODM_RTL8822B |\
-					   ODM_RTL8821C | ODM_RTL8822C)
-
-/*[ARFR]*/
-/*for MAC HW control rate_id=0~12 and 2.4g vht mode(1ss/2ss) support*/
-#define PHYDM_IC_RATEID_IDX_TYPE2 (ODM_RTL8822B | ODM_RTL8822C | ODM_RTL8195B |\
-				  ODM_RTL8821C)
-
 /*@========[Compile time IC flag] ========================*/
 /*@========[AC-3/AC/N Support] ===========================*/
 
@@ -623,10 +603,6 @@ enum phydm_ic {
 	#define PHYSTS_3RD_TYPE_SUPPORT
 #endif
 
-#ifdef PHYSTS_3RD_TYPE_SUPPORT
-	#define PHYSTS_AUTO_SWITCH_IC (ODM_RTL8822C)
-#endif
-
 #if (RTL8198F_SUPPORT || RTL8814B_SUPPORT || RTL8822C_SUPPORT ||\
 	RTL8812F_SUPPORT || RTL8197G_SUPPORT)
 	#define BB_RAM_SUPPORT
@@ -642,14 +618,14 @@ enum phydm_ic {
 	#define CONFIG_MU_JAGUAR_2
 #endif
 
-#if (RTL8814B_SUPPORT || RTL8822C_SUPPORT  || RTL8812F_SUPPORT)
+#if (RTL8814B_SUPPORT || RTL8822C_SUPPORT)
 	#define CONFIG_MU_JAGUAR_3
 #endif
 
 #if (defined(CONFIG_MU_JAGUAR_2) || defined(CONFIG_MU_JAGUAR_3))
 	#if (RTL8814B_SUPPORT)
 		#define MU_EX_MACID		76
-	#elif (RTL8822B_SUPPORT || RTL8822C_SUPPORT || RTL8812F_SUPPORT)
+	#elif (RTL8822B_SUPPORT || RTL8822C_SUPPORT)
 		#define MU_EX_MACID		30
 	#endif
 #endif
@@ -662,17 +638,7 @@ enum phydm_ic {
 #define PHYDM_COMMON_API_SUPPORT
 #endif
 
-#define PHYDM_COMMON_API_IC (ODM_IC_JGR3_SERIES | ODM_RTL8822B  |\
-		ODM_RTL8197F | ODM_RTL8821C | ODM_RTL8192F | ODM_RTL8195B |\
-		ODM_RTL8721D | ODM_RTL8710C)
-
-#if (RTL8188E_SUPPORT || RTL8192E_SUPPORT || RTL8821A_SUPPORT ||\
-	RTL8812A_SUPPORT || RTL8723B_SUPPORT || RTL8703B_SUPPORT ||\
-	RTL8195A_SUPPORT || RTL8814A_SUPPORT)
-#define PHYDM_COMMON_API_NOT_SUPPORT
-#endif
-
-#if (RTL8821C_SUPPORT || RTL8197F_SUPPORT || RTL8197G_SUPPORT)
+#if (RTL8821C_SUPPORT || RTL8197F_SUPPORT || RTL8814B_SUPPORT)
 	#define CONFIG_RFE_BY_HW_INFO
 #endif
 
@@ -707,17 +673,6 @@ enum phydm_ic {
 #endif
 
 #define	LOW_BW_RATE_NUM		VHT_RATE_NUM
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-#define	SECOND_CH_AT_LSB	2	/*@primary CH @ MSB,  SD4: HAL_PRIME_CHNL_OFFSET_UPPER*/
-#define	SECOND_CH_AT_USB	1	/*@primary CH @ LSB,   SD4: HAL_PRIME_CHNL_OFFSET_LOWER*/
-#elif (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-#define	SECOND_CH_AT_LSB	2	/*@primary CH @ MSB,  SD7: HAL_PRIME_CHNL_OFFSET_UPPER*/
-#define	SECOND_CH_AT_USB	1	/*@primary CH @ LSB,   SD7: HAL_PRIME_CHNL_OFFSET_LOWER*/
-#else /*if (DM_ODM_SUPPORT_TYPE == ODM_AP)*/
-#define	SECOND_CH_AT_LSB	1	/*@primary CH @ MSB,  SD8: HT_2NDCH_OFFSET_BELOW*/
-#define	SECOND_CH_AT_USB	2	/*@primary CH @ LSB,   SD8: HT_2NDCH_OFFSET_ABOVE*/
-#endif
 
 enum phydm_ic_ip {
 	PHYDM_IC_N		= 0,
@@ -935,25 +890,6 @@ enum odm_power_voltage {
 	ODM_POWER_18V		= 0,
 	ODM_POWER_33V		= 1,
 };
-
-/* ODM_CMNINFO_ANTDIV_GPIO */
-enum odm_antdiv_gpio {
-	ANTDIV_GPIO_PA2PA4	= 0,
-	ANTDIV_GPIO_PA5PA6	= 1,
-	ANTDIV_GPIO_PA12PA13	= 2,
-	ANTDIV_GPIO_PA14PA15	= 3,
-	ANTDIV_GPIO_PA16PA17	= 4,
-	ANTDIV_GPIO_PB1PB2	= 5,
-	ANTDIV_GPIO_PB26PB29	= 6,
-};
-
-/* ODM_CMNINFO_PEAK_DETECT_MODE */
-enum odm_peak_detect_mode {
-	ODM_PD_DIS		= 0,
-	ODM_PD_ENG		= 1,
-	ODM_PD_ENA		= 2,
-	ODM_PD_ENALL		= 3,
-};
 #endif
 
 #define	PAUSE_FAIL		0
@@ -962,9 +898,7 @@ enum odm_peak_detect_mode {
 enum odm_parameter_init {
 	ODM_PRE_SETTING		= 0,
 	ODM_POST_SETTING	= 1,
-	ODM_INIT_FW_SETTING	= 2,
-	ODM_PRE_RF_SET		= 3,
-	ODM_POST_RF_SET		= 4
+	ODM_INIT_FW_SETTING
 };
 
 enum phydm_pause_type {

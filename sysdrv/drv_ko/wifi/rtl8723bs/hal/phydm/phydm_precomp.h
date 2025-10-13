@@ -183,10 +183,6 @@ void phy_set_tx_power_limit(
 	u8 *channel,
 	u8 *power_limit);
 
-void phy_set_tx_power_limit_ex(struct dm_struct *dm, u8 regulation, u8 band,
-			       u8 bandwidth, u8 rate_section, u8 rf_path,
-			       u8 channel, s8 power_limit);
-
 enum hal_status
 rtw_phydm_fw_iqk(
 	struct dm_struct *dm,
@@ -472,7 +468,6 @@ rtw_phydm_cfg_phy_para(
 	#include "rtl8821c/halhwimg8821c_mac.h"
 	#include "rtl8821c/halhwimg8821c_bb.h"
 	#include "rtl8821c/phydm_regconfig8821c.h"
-	#include "rtl8821c/phydm_rtl8821c.h"
 	#include "halrf/rtl8821c/halrf_8821c.h"
 	#include "halrf/rtl8821c/halhwimg8821c_rf.h"
 	#include "halrf/rtl8821c/version_rtl8821c_rf.h"
@@ -611,7 +606,6 @@ rtw_phydm_cfg_phy_para(
 	#include "halrf/rtl8812f/version_rtl8812f_rf.h"
 	#include "rtl8812f/phydm_hal_api8812f.h"
 	#include "rtl8812f/version_rtl8812f.h"
-	#include "rtl8812f/phydm_rtl8812f.h"
 #endif
 #if (RTL8197G_SUPPORT)
 	#include "rtl8197g/halhwimg8197g_bb.h"
@@ -622,6 +616,5 @@ rtw_phydm_cfg_phy_para(
 	#include "halrf/rtl8197g/version_rtl8197g_rf.h"
 	#include "rtl8197g/phydm_hal_api8197g.h"
 	#include "rtl8197g/version_rtl8197g.h"
-	#include "rtl8197g/phydm_rtl8197g.h"
 #endif
 #endif /* @__ODM_PRECOMP_H__ */

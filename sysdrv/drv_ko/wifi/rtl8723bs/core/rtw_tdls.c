@@ -1814,9 +1814,9 @@ int On_TDLS_Dis_Rsp(_adapter *padapter, union recv_frame *precv_frame)
 			issue_tdls_setup_req(padapter, &txmgmt, _FALSE);
 		}
 	}
-exit:
 #endif /* CONFIG_TDLS_AUTOSETUP */
 
+exit:
 	return ret;
 
 }
@@ -1911,15 +1911,13 @@ sint On_TDLS_Setup_Req(_adapter *padapter, union recv_frame *precv_frame, struct
 
 			switch (pIE->ElementID) {
 			case _SUPPORTEDRATES_IE_:
-				if (pIE->Length <= sizeof(supportRate)) {
-					_rtw_memcpy(supportRate, pIE->data, pIE->Length);
-					supportRateNum = pIE->Length;
-				}
+				_rtw_memcpy(supportRate, pIE->data, pIE->Length);
+				supportRateNum = pIE->Length;
 				break;
 			case _COUNTRY_IE_:
 				break;
 			case _EXT_SUPPORTEDRATES_IE_:
-				if ((supportRateNum + pIE->Length) <= sizeof(supportRate)) {
+				if (supportRateNum < sizeof(supportRate)) {
 					_rtw_memcpy(supportRate + supportRateNum, pIE->data, pIE->Length);
 					supportRateNum += pIE->Length;
 				}
@@ -1930,19 +1928,17 @@ sint On_TDLS_Setup_Req(_adapter *padapter, union recv_frame *precv_frame, struct
 				rsnie_included = 1;
 				if (prx_pkt_attrib->encrypt) {
 					prsnie = (u8 *)pIE;
-					if (pIE->Length <= sizeof(ptdls_sta->TDLS_RSNIE)) {
-						/* Check CCMP pairwise_cipher presence. */
-						ppairwise_cipher = prsnie + 10;
-						_rtw_memcpy(ptdls_sta->TDLS_RSNIE, pIE->data, pIE->Length);
-						pairwise_count = *(u16 *)(ppairwise_cipher - 2);
-						for (k = 0; k < pairwise_count; k++) {
-							if (_rtw_memcmp(ppairwise_cipher + 4 * k, RSN_CIPHER_SUITE_CCMP, 4) == _TRUE)
-								ccmp_included = 1;
-						}
-
-						if (ccmp_included == 0)
-							txmgmt.status_code = _STATS_INVALID_RSNIE_;
+					/* Check CCMP pairwise_cipher presence. */
+					ppairwise_cipher = prsnie + 10;
+					_rtw_memcpy(ptdls_sta->TDLS_RSNIE, pIE->data, pIE->Length);
+					pairwise_count = *(u16 *)(ppairwise_cipher - 2);
+					for (k = 0; k < pairwise_count; k++) {
+						if (_rtw_memcmp(ppairwise_cipher + 4 * k, RSN_CIPHER_SUITE_CCMP, 4) == _TRUE)
+							ccmp_included = 1;
 					}
+
+					if (ccmp_included == 0)
+						txmgmt.status_code = _STATS_INVALID_RSNIE_;
 				}
 				break;
 			case _EXT_CAP_IE_:
@@ -2097,15 +2093,13 @@ int On_TDLS_Setup_Rsp(_adapter *padapter, union recv_frame *precv_frame, struct 
 
 		switch (pIE->ElementID) {
 		case _SUPPORTEDRATES_IE_:
-			if (pIE->Length <= sizeof(supportRate)) {
-				_rtw_memcpy(supportRate, pIE->data, pIE->Length);
-				supportRateNum = pIE->Length;
-			}
+			_rtw_memcpy(supportRate, pIE->data, pIE->Length);
+			supportRateNum = pIE->Length;
 			break;
 		case _COUNTRY_IE_:
 			break;
 		case _EXT_SUPPORTEDRATES_IE_:
-			if ((supportRateNum + pIE->Length) <= sizeof(supportRate)) {
+			if (supportRateNum < sizeof(supportRate)) {
 				_rtw_memcpy(supportRate + supportRateNum, pIE->data, pIE->Length);
 				supportRateNum += pIE->Length;
 			}
@@ -2205,7 +2199,7 @@ int On_TDLS_Setup_Rsp(_adapter *padapter, union recv_frame *precv_frame, struct 
 
 			if (ptdls_sta->tdls_sta_state & TDLS_RESPONDER_STATE) {
 				ptdls_sta->tdls_sta_state |= TDLS_LINKED_STATE;
-				ptdls_sta->state |= WIFI_ASOC_STATE;
+				ptdls_sta->state |= _FW_LINKED;
 				_cancel_timer_ex(&ptdls_sta->handshake_timer);
 			}
 
@@ -2322,7 +2316,7 @@ int On_TDLS_Setup_Cfm(_adapter *padapter, union recv_frame *precv_frame, struct 
 
 		if (ptdls_sta->tdls_sta_state & TDLS_INITIATOR_STATE) {
 			ptdls_sta->tdls_sta_state |= TDLS_LINKED_STATE;
-			ptdls_sta->state |= WIFI_ASOC_STATE;
+			ptdls_sta->state |= _FW_LINKED;
 			_cancel_timer_ex(&ptdls_sta->handshake_timer);
 		}
 
@@ -2774,7 +2768,7 @@ void wfd_ie_tdls(_adapter *padapter, u8 *pframe, u32 *pktlen)
 
 	/* Value: */
 	/* Associated BSSID */
-	if (check_fwstate(pmlmepriv, WIFI_ASOC_STATE) == _TRUE)
+	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE)
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
 		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);

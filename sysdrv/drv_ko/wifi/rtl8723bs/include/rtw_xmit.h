@@ -117,16 +117,10 @@
 #define BK_QUEUE_INX		3
 #define BCN_QUEUE_INX		4
 #define MGT_QUEUE_INX		5
-#define TXCMD_QUEUE_INX		6
-#define HIGH_QUEUE_INX		7
-/* keep high queue to be the last one, so we can extend HIQ to port 1, 2, ... */
+#define HIGH_QUEUE_INX		6
+#define TXCMD_QUEUE_INX	7
 
-#ifndef CONFIG_PORT_BASED_HIQ
 #define HW_QUEUE_ENTRY	8
-#else
-#define HI_QUEUE_INX(n)	(HIGH_QUEUE_INX + (n))
-#define HW_QUEUE_ENTRY	(8 + CONFIG_IFACE_NUMBER - 1)
-#endif
 
 #ifdef CONFIG_PCI_HCI
 	#ifdef CONFIG_TRX_BD_ARCH
@@ -171,8 +165,6 @@
 		pattrib_iv[6] = dot11txpn._byte_.TSC4;\
 		pattrib_iv[7] = dot11txpn._byte_.TSC5;\
 	} while (0)
-
-#define GCMP_IV(a, b, c) AES_IV(a, b, c)
 
 /* Check if AMPDU Tx is supported or not. If it is supported,
 * it need to check "amsdu in ampdu" is supported or not.
@@ -326,7 +318,7 @@ union txdesc {
 #endif
 
 #ifdef CONFIG_PCI_HCI
-#define PCI_MAX_TX_QUEUE_COUNT	HW_QUEUE_ENTRY
+#define PCI_MAX_TX_QUEUE_COUNT	8	/* == HW_QUEUE_ENTRY */
 
 struct rtw_tx_ring {
 	unsigned char	qid;
@@ -432,7 +424,9 @@ struct pkt_attrib {
 	u32	last_txcmdsz;
 	u8	nr_frags;
 	u8	encrypt;	/* when 0 indicate no encrypt. when non-zero, indicate the encrypt algorith */
+#if defined(CONFIG_CONCURRENT_MODE)
 	u8	bmc_camid;
+#endif
 	u8	iv_len;
 	u8	icv_len;
 	u8	iv[18];
@@ -445,9 +439,6 @@ struct pkt_attrib {
 	u8	src[ETH_ALEN];
 	u8	ta[ETH_ALEN];
 	u8	ra[ETH_ALEN];
-#ifdef CONFIG_RTW_WDS
-	u8	wds;
-#endif
 #ifdef CONFIG_RTW_MESH
 	u8	mda[ETH_ALEN];	/* mesh da */
 	u8	msa[ETH_ALEN];	/* mesh sa */
@@ -520,12 +511,6 @@ struct pkt_attrib {
 #endif
 
 };
-#endif
-
-#ifdef CONFIG_RTW_WDS
-#define XATTRIB_GET_WDS(xattrib) ((xattrib)->wds)
-#else
-#define XATTRIB_GET_WDS(xattrib) 0
 #endif
 
 #ifdef CONFIG_RTW_MESH
@@ -664,7 +649,6 @@ struct xmit_frame {
 
 	struct pkt_attrib attrib;
 
-	u16 os_qid;
 	_pkt *pkt;
 
 	int	frame_tag;
@@ -869,9 +853,6 @@ struct	xmit_priv	{
 	_mutex ack_tx_mutex;
 	struct submit_ctx ack_tx_ops;
 	u8 seq_no;
-#ifdef CONFIG_REMOVE_DUP_TX_STATE
-	u8 retry_count;
-#endif
 #endif
 
 #ifdef CONFIG_TX_AMSDU
@@ -962,7 +943,7 @@ extern void rtw_update_protection(_adapter *padapter, u8 *ie, uint ie_len);
 extern s32 rtw_make_wlanhdr(_adapter *padapter, u8 *hdr, struct pkt_attrib *pattrib);
 extern s32 rtw_put_snap(u8 *data, u16 h_proto);
 
-extern struct xmit_frame *rtw_alloc_xmitframe(struct xmit_priv *pxmitpriv, u16 os_qid);
+extern struct xmit_frame *rtw_alloc_xmitframe(struct xmit_priv *pxmitpriv);
 struct xmit_frame *rtw_alloc_xmitframe_ext(struct xmit_priv *pxmitpriv);
 struct xmit_frame *rtw_alloc_xmitframe_once(struct xmit_priv *pxmitpriv);
 extern s32 rtw_free_xmitframe(struct xmit_priv *pxmitpriv, struct xmit_frame *pxmitframe);
@@ -1005,7 +986,7 @@ void rtw_xmit_dequeue_callback(_workitem *work);
 void rtw_xmit_queue_set(struct sta_info *sta);
 void rtw_xmit_queue_clear(struct sta_info *sta);
 s32 rtw_xmit_posthandle(_adapter *padapter, struct xmit_frame *pxmitframe, _pkt *pkt);
-s32 rtw_xmit(_adapter *padapter, _pkt **pkt, u16 os_qid);
+s32 rtw_xmit(_adapter *padapter, _pkt **pkt);
 bool xmitframe_hiq_filter(struct xmit_frame *xmitframe);
 #if defined(CONFIG_AP_MODE) || defined(CONFIG_TDLS)
 sint xmitframe_enqueue_for_sleeping_sta(_adapter *padapter, struct xmit_frame *pxmitframe);
@@ -1019,8 +1000,6 @@ u8 rtw_get_tx_bw_mode(_adapter *adapter, struct sta_info *sta);
 void rtw_update_tx_rate_bmp(struct dvobj_priv *dvobj);
 u8 rtw_get_tx_bw_bmp_of_ht_rate(struct dvobj_priv *dvobj, u8 rate, u8 max_bw);
 u8 rtw_get_tx_bw_bmp_of_vht_rate(struct dvobj_priv *dvobj, u8 rate, u8 max_bw);
-s16 rtw_adapter_get_oper_txpwr_max_mbm(_adapter *adapter, bool eirp);
-s16 rtw_get_oper_txpwr_max_mbm(struct dvobj_priv *dvobj, bool eirp);
 
 u8 query_ra_short_GI(struct sta_info *psta, u8 bw);
 
@@ -1087,7 +1066,6 @@ void dump_xmit_block(void *sel, _adapter *padapter);
 void rtw_set_xmit_block(_adapter *padapter, enum XMIT_BLOCK_REASON reason);
 void rtw_clr_xmit_block(_adapter *padapter, enum XMIT_BLOCK_REASON reason);
 bool rtw_is_xmit_blocked(_adapter *padapter);
-void rtw_hci_flush(_adapter *padapter);
 
 /* include after declaring struct xmit_buf, in order to avoid warning */
 #include <xmit_osdep.h>

@@ -972,24 +972,6 @@ int	_rtw_memcmp(const void *dst, const void *src, u32 sz)
 
 }
 
-int _rtw_memcmp2(const void *dst, const void *src, u32 sz)
-{
-	const unsigned char *p1 = dst, *p2 = src;
-
-	if (sz == 0)
-		return 0;
-
-	while (*p1 == *p2) {
-		p1++;
-		p2++;
-		sz--;
-		if (sz == 0)
-			return 0;
-	}
-
-	return *p1 - *p2;
-}
-
 void _rtw_memset(void *pbuf, int c, u32 sz)
 {
 
@@ -1309,7 +1291,11 @@ u32 _rtw_down_sema(_sema *sema)
 inline void thread_exit(_completion *comp)
 {
 #ifdef PLATFORM_LINUX
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,17,0))
+	kthread_complete_and_exit(comp, 0);
+#else
 	complete_and_exit(comp, 0);
+#endif
 #endif
 
 #ifdef PLATFORM_FREEBSD
@@ -1822,46 +1808,6 @@ void rtw_yield_os(void)
 #endif
 }
 
-const char *_rtw_pwait_type_str[] = {
-	[RTW_PWAIT_TYPE_MSLEEP] = "MS",
-	[RTW_PWAIT_TYPE_USLEEP] = "US",
-	[RTW_PWAIT_TYPE_YIELD] = "Y",
-	[RTW_PWAIT_TYPE_MDELAY] = "MD",
-	[RTW_PWAIT_TYPE_UDELAY] = "UD",
-	[RTW_PWAIT_TYPE_NUM] = "unknown",
-};
-
-static void rtw_pwctx_yield(int us)
-{
-	rtw_yield_os();
-}
-
-static void (*const rtw_pwait_hdl[])(int)= {
-	[RTW_PWAIT_TYPE_MSLEEP] = rtw_msleep_os,
-	[RTW_PWAIT_TYPE_USLEEP] = rtw_usleep_os,
-	[RTW_PWAIT_TYPE_YIELD] = rtw_pwctx_yield,
-	[RTW_PWAIT_TYPE_MDELAY] = rtw_mdelay_os,
-	[RTW_PWAIT_TYPE_UDELAY] = rtw_udelay_os,
-};
-
-int rtw_pwctx_config(struct rtw_pwait_ctx *pwctx, enum rtw_pwait_type type, s32 time, s32 cnt_lmt)
-{
-	int ret = _FAIL;
-
-	if (!RTW_PWAIT_TYPE_VALID(type))
-		goto exit;
-
-	pwctx->conf.type = type;
-	pwctx->conf.wait_time = time;
-	pwctx->conf.wait_cnt_lmt = cnt_lmt;
-	pwctx->wait_hdl = rtw_pwait_hdl[type];
-
-	ret = _SUCCESS;
-
-exit:
-	return ret;
-}
-
 bool rtw_macaddr_is_larger(const u8 *a, const u8 *b)
 {
 	u32 va, vb;
@@ -2271,23 +2217,15 @@ static int isFileReadable(const char *path, u32 *sz)
 {
 	struct file *fp;
 	int ret = 0;
-	#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-	mm_segment_t oldfs;
-	#endif
+//	mm_segment_t oldfs;
 	char buf;
 
 	fp = filp_open(path, O_RDONLY, 0);
 	if (IS_ERR(fp))
 		ret = PTR_ERR(fp);
 	else {
-		#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-		oldfs = get_fs();
-		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0))
-		set_fs(KERNEL_DS);
-		#else
-		set_fs(get_ds());
-		#endif
-		#endif
+//		oldfs = get_fs();
+//		set_fs(get_ds());
 
 		if (1 != readFile(fp, &buf, 1))
 			ret = PTR_ERR(fp);
@@ -2300,9 +2238,7 @@ static int isFileReadable(const char *path, u32 *sz)
 			#endif
 		}
 
-		#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-		set_fs(oldfs);
-		#endif
+//		set_fs(oldfs);
 		filp_close(fp, NULL);
 	}
 	return ret;
@@ -2318,9 +2254,7 @@ static int isFileReadable(const char *path, u32 *sz)
 static int retriveFromFile(const char *path, u8 *buf, u32 sz)
 {
 	int ret = -1;
-	#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-	mm_segment_t oldfs;
-	#endif
+//	mm_segment_t oldfs;
 	struct file *fp;
 
 	if (path && buf) {
@@ -2328,20 +2262,10 @@ static int retriveFromFile(const char *path, u8 *buf, u32 sz)
 		if (0 == ret) {
 			RTW_INFO("%s openFile path:%s fp=%p\n", __FUNCTION__, path , fp);
 
-			#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-			oldfs = get_fs();
-			#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0))
-			set_fs(KERNEL_DS);
-			#else
-			set_fs(get_ds());
-			#endif
-			#endif
-
+//			oldfs = get_fs();
+//			set_fs(get_ds());
 			ret = readFile(fp, buf, sz);
-
-			#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-			set_fs(oldfs);
-			#endif
+//			set_fs(oldfs);
 			closeFile(fp);
 
 			RTW_INFO("%s readFile, ret:%d\n", __FUNCTION__, ret);
@@ -2365,9 +2289,7 @@ static int retriveFromFile(const char *path, u8 *buf, u32 sz)
 static int storeToFile(const char *path, u8 *buf, u32 sz)
 {
 	int ret = 0;
-	#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-	mm_segment_t oldfs;
-	#endif
+//	mm_segment_t oldfs;
 	struct file *fp;
 
 	if (path && buf) {
@@ -2375,20 +2297,10 @@ static int storeToFile(const char *path, u8 *buf, u32 sz)
 		if (0 == ret) {
 			RTW_INFO("%s openFile path:%s fp=%p\n", __FUNCTION__, path , fp);
 
-			#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-			oldfs = get_fs();
-			#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0))
-			set_fs(KERNEL_DS);
-			#else
-			set_fs(get_ds());
-			#endif
-			#endif
-
+//			oldfs = get_fs();
+//			set_fs(get_ds());
 			ret = writeFile(fp, buf, sz);
-
-			#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 0))
-			set_fs(oldfs);
-			#endif
+//			set_fs(oldfs);
 			closeFile(fp);
 
 			RTW_INFO("%s writeFile, ret:%d\n", __FUNCTION__, ret);
@@ -2621,7 +2533,7 @@ int rtw_change_ifname(_adapter *padapter, const char *ifname)
 
 	rtw_init_netdev_name(pnetdev, ifname);
 
-	_rtw_memcpy(pnetdev->dev_addr, adapter_mac_addr(padapter), ETH_ALEN);
+	eth_hw_addr_set(pnetdev, adapter_mac_addr(padapter));
 
 	if (rtnl_lock_needed)
 		ret = register_netdev(pnetdev);
@@ -2743,8 +2655,9 @@ u64 rtw_division64(u64 x, u64 y)
 
 inline u32 rtw_random32(void)
 {
-#ifdef PLATFORM_LINUX
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0))
+	return get_random_u32();
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
 	return prandom_u32();
 #elif (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 18))
 	u32 random_int;
@@ -2752,11 +2665,6 @@ inline u32 rtw_random32(void)
 	return random_int;
 #else
 	return random32();
-#endif
-#elif defined(PLATFORM_WINDOWS)
-#error "to be implemented\n"
-#elif defined(PLATFORM_FREEBSD)
-#error "to be implemented\n"
 #endif
 }
 
@@ -2993,7 +2901,6 @@ exit:
 	return val;
 }
 
-#ifdef CONFIG_RTW_MESH
 int rtw_blacklist_add(_queue *blist, const u8 *addr, u32 timeout_ms)
 {
 	struct blacklist_ent *ent;
@@ -3151,7 +3058,6 @@ void dump_blacklist(void *sel, _queue *blist, const char *title)
 	}
 	exit_critical_bh(&blist->lock);
 }
-#endif
 
 /**
 * is_null -

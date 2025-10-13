@@ -38,7 +38,6 @@
 #ifdef CONFIG_BT_COEXIST
 #define BTCOEX_ALIVE	BIT(4)
 #endif /* CONFIG_BT_COEXIST */
-#define LPS_ALIVE	BIT(5)
 
 #ifdef CONFIG_WOWLAN
 	#ifdef CONFIG_PLATFORM_ANDROID_INTEL_X86
@@ -57,7 +56,6 @@
 
 #define MAX_WKFM_SIZE	16 /* (16 bytes for WKFM bit mask, 16*8 = 128 bits) */
 #define MAX_WKFM_PATTERN_SIZE	128
-#define MAX_IN_PATTERN_SIZE		512
 
 /*
  * MAX_WKFM_PATTERN_STR_LEN : the max. length of wow pattern string
@@ -385,6 +383,11 @@ struct pwrctrl_priv {
 	systime	lps_deny_time; /* will deny LPS when system time is smaller than this */
 	s32		pnp_current_pwr_state;
 	u8		pnp_bstop_trx;
+
+	#ifdef CONFIG_AUTOSUSPEND
+	int		ps_flag; /* used by autosuspend */
+	u8		bInternalAutoSuspend;
+	#endif
 	u8		bInSuspend;
 #ifdef CONFIG_BT_COEXIST
 	u8		bAutoResume;
@@ -401,8 +404,6 @@ struct pwrctrl_priv {
 
 #ifdef CONFIG_GPIO_WAKEUP
 	u8		is_high_active;
-	u8		wowlan_gpio_index;
-	u8		wowlan_gpio_output_state;
 #endif /* CONFIG_GPIO_WAKEUP */
 	u8		hst2dev_high_active;
 #ifdef CONFIG_WOWLAN
@@ -479,14 +480,14 @@ struct pwrctrl_priv {
 #endif
 	u8 current_lps_hw_port_id;
 
-#ifdef CONFIG_RTW_CFGVENDOR_LLSTATS
+#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 	systime radio_on_start_time;
 	systime pwr_saving_start_time;
 	u32 pwr_saving_time;
 	u32 on_time;
 	u32 tx_time;
 	u32 rx_time;
-#endif /* CONFIG_RTW_CFGVENDOR_LLSTATS */
+#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 #ifdef CONFIG_LPS_ACK
 	struct submit_ctx lps_ack_sctx;
@@ -541,6 +542,9 @@ int ips_leave(_adapter *padapter);
 
 void rtw_ps_processor(_adapter *padapter);
 
+#ifdef CONFIG_AUTOSUSPEND
+int autoresume_enter(_adapter *padapter);
+#endif
 #ifdef SUPPORT_HW_RFOFF_DETECTED
 rt_rf_power_state RfOnOffDetect(PADAPTER pAdapter);
 #endif
@@ -554,8 +558,7 @@ int rtw_fw_ps_state(PADAPTER padapter);
 extern const char * const LPS_CTRL_PHYDM;
 void LPS_Enter(PADAPTER padapter, const char *msg);
 void LPS_Leave(PADAPTER padapter, const char *msg);
-void rtw_exec_lps(_adapter *padapter, u8 ps_mode);
-void rtw_lps_rfon_ctrl(_adapter *padapter, u8 rfon_ctrl);
+void rtw_leave_lps_and_chk(_adapter *padapter, u8 ps_mode);
 #ifdef CONFIG_CHECK_LEAVE_LPS
 #ifdef CONFIG_LPS_CHK_BY_TP
 void traffic_check_for_leave_lps_by_tp(PADAPTER padapter, u8 tx, struct sta_info *sta);

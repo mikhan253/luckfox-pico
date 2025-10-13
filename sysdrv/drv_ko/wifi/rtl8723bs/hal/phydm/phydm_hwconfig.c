@@ -251,8 +251,6 @@ odm_config_rf_with_header_file(struct dm_struct *dm,
 				READ_AND_CONFIG_MP(8822b, _txpwr_lmt_type17);
 			else if (dm->rfe_type == 18)
 				READ_AND_CONFIG_MP(8822b, _txpwr_lmt_type18);
-			//else if (dm->rfe_type == 19)
-				//READ_AND_CONFIG_MP(8822b, _txpwr_lmt_type19);
 			else
 				READ_AND_CONFIG_MP(8822b, _txpwr_lmt);
 		}
@@ -665,8 +663,6 @@ odm_config_rf_with_tx_pwr_track_header_file(struct dm_struct *dm)
 			READ_AND_CONFIG_MP(8822b, _txpowertrack_type17);
 		else if (dm->rfe_type == 18)
 			READ_AND_CONFIG_MP(8822b, _txpowertrack_type18);
-		//else if (dm->rfe_type == 19)
-			//READ_AND_CONFIG_MP(8822b, _txpowertrack_type19);
 		else
 			READ_AND_CONFIG_MP(8822b, _txpowertrack);
 	}
@@ -807,13 +803,8 @@ odm_config_rf_with_tx_pwr_track_header_file(struct dm_struct *dm)
 
 #if RTL8195B_SUPPORT
 	if (dm->support_ic_type == ODM_RTL8195B) {
-		if (dm->package_type == 1) {
-			READ_AND_CONFIG_MP(8195b, _txpowertrack_pkg1);
-			READ_AND_CONFIG_MP(8195b, _txxtaltrack_pkg1);
-		} else {
-			READ_AND_CONFIG_MP(8195b, _txpowertrack);
-			READ_AND_CONFIG_MP(8195b, _txxtaltrack);
-		}
+		READ_AND_CONFIG_MP(8195b, _txpowertrack);
+		READ_AND_CONFIG_MP(8195b, _txxtaltrack);
 	}
 #endif
 
@@ -836,8 +827,6 @@ odm_config_rf_with_tx_pwr_track_header_file(struct dm_struct *dm)
 			READ_AND_CONFIG_MP(8812f, _txpowertrack_type2);
 		else if (dm->rfe_type == 3)
 			READ_AND_CONFIG_MP(8812f, _txpowertrack_type3);
-		else if (dm->rfe_type == 4)
-			READ_AND_CONFIG_MP(8812f, _txpowertrack_type4);
 		else
 			READ_AND_CONFIG_MP(8812f, _txpowertrack);
 	}
@@ -1075,8 +1064,6 @@ odm_config_bb_with_header_file(struct dm_struct *dm,
 				READ_AND_CONFIG_MP(8822b, _phy_reg_pg_type17);
 			else if (dm->rfe_type == 18)
 				READ_AND_CONFIG_MP(8822b, _phy_reg_pg_type18);
-			//else if (dm->rfe_type == 19)
-				//READ_AND_CONFIG_MP(8822b, _phy_reg_pg_type19);
 			else
 				READ_AND_CONFIG_MP(8822b, _phy_reg_pg);
 		}
@@ -1235,18 +1222,12 @@ odm_config_bb_with_header_file(struct dm_struct *dm,
 #endif
 #if (RTL8195B_SUPPORT == 1)
 	if (dm->support_ic_type == ODM_RTL8195B) {
-		if (config_type == CONFIG_BB_PHY_REG) {
+		if (config_type == CONFIG_BB_PHY_REG)
 			READ_AND_CONFIG(8195b, _phy_reg);
-		} else if (config_type == CONFIG_BB_AGC_TAB) {
+		else if (config_type == CONFIG_BB_AGC_TAB)
 			READ_AND_CONFIG(8195b, _agc_tab);
-		} else if (config_type == CONFIG_BB_PHY_REG_PG) {
+		else if (config_type == CONFIG_BB_PHY_REG_PG)
 			READ_AND_CONFIG(8195b, _phy_reg_pg);
-		} else if (config_type == CONFIG_BB_PHY_REG_MP) {
-			if (dm->package_type == 1)
-				odm_set_bb_reg(dm, R_0xaa8, 0x1f0000, 0x10);
-			else
-				odm_set_bb_reg(dm, R_0xaa8, 0x1f0000, 0x12);
-		}
 	}
 #endif
 #if (RTL8198F_SUPPORT == 1)

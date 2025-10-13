@@ -1145,9 +1145,6 @@ void phydm_la_set_mac_trigger_time(void *dm_void, u32 trigger_time_mu_sec)
 		odm_set_mac_reg(dm, R_0x7fc, BIT(2) | BIT(1) | BIT(0), unit);
 		odm_set_mac_reg(dm, R_0x7f0, 0x7f00, (time_unit_num & 0x7f));
 	#ifdef PHYDM_IC_JGR3_SERIES_SUPPORT
-	} else if (dm->support_ic_type & ODM_RTL8814B) {
-		odm_set_mac_reg(dm, R_0x7cc, BIT(20) | BIT(19) | BIT(18), unit);
-		odm_set_mac_reg(dm, R_0x7c0, 0x7f00, (time_unit_num & 0x7f));
 	} else if (dm->support_ic_type & ODM_IC_JGR3_SERIES) {
 		odm_set_mac_reg(dm, R_0x7cc, BIT(18) | BIT(17) | BIT(16), unit);
 		odm_set_mac_reg(dm, R_0x7c0, 0x7f00, (time_unit_num & 0x7f));
@@ -1213,14 +1210,7 @@ void phydm_la_set_buff_mode(void *dm_void, enum la_buff_mode mode)
 
 	buf->buffer_size = buff_size_base;
 
-	if (dm->support_ic_type & ODM_RTL8814B) {
-		if (mode == ADCSMP_BUFF_HALF) {
-			odm_set_mac_reg(dm, R_0x7cc, BIT(21), 0);
-		} else {
-			buf->buffer_size = buf->buffer_size << 1;
-			odm_set_mac_reg(dm, R_0x7cc, BIT(21), 1);
-		}
-	} else if (dm->support_ic_type & FULL_BUFF_MODE_SUPPORT) {
+	if (dm->support_ic_type & FULL_BUFF_MODE_SUPPORT) {
 		if (mode == ADCSMP_BUFF_HALF) {
 			odm_set_mac_reg(dm, R_0x7cc, BIT(30), 0);
 		} else {
@@ -1573,9 +1563,6 @@ void phydm_la_init(void *dm_void)
 	struct rt_adcsmp *smp = &dm->adcsmp;
 	struct rt_adcsmp_string *buf = &smp->adc_smp_buf;
 
-	if (!(dm->support_ic_type & PHYDM_IC_SUPPORT_LA_MODE))
-		return;
-
 	smp->adc_smp_state = ADCSMP_STATE_IDLE;
 	smp->is_la_print = true;
 	smp->en_fake_trig = false;
@@ -1590,9 +1577,6 @@ void phydm_la_init(void *dm_void)
 void adc_smp_de_init(void *dm_void)
 {
 	struct dm_struct *dm = (struct dm_struct *)dm_void;
-
-	if (!(dm->support_ic_type & PHYDM_IC_SUPPORT_LA_MODE))
-		return;
 
 	phydm_la_stop(dm);
 	phydm_la_buffer_release(dm);
@@ -1610,4 +1594,98 @@ void adc_smp_work_item_callback(void *context)
 	phydm_la_adc_smp_start(dm);
 }
 #endif
+
+#if 0
+#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+enum rt_status
+adc_smp_query(void *dm_void, ULONG info_buf_length, void *info_buf,
+	      PULONG bytes_written)
+{
+	struct dm_struct *dm = (struct dm_struct *)dm_void;
+	struct rt_adcsmp *smp = &dm->adcsmp;
+	enum rt_status ret_status = RT_STATUS_SUCCESS;
+	struct rt_adcsmp_string *buf = &smp->adc_smp_buf;
+
+	pr_debug("[%s] LA_State=((%d))", __func__, smp->adc_smp_state);
+
+	if (info_buf_length != buf->buffer_size) {
+		*bytes_written = 0;
+		ret_status = RT_STATUS_RESOURCE;
+	} else if (buf->length != buf->buffer_size) {
+		*bytes_written = 0;
+		ret_status = RT_STATUS_RESOURCE;
+	} else if (smp->adc_smp_state != ADCSMP_STATE_QUERY) {
+		*bytes_written = 0;
+		ret_status = RT_STATUS_PENDING;
+	} else {
+		odm_move_memory(dm, info_buf, buf->octet, buf->buffer_size);
+		*bytes_written = buf->buffer_size;
+
+		smp->adc_smp_state = ADCSMP_STATE_IDLE;
+	}
+
+	pr_debug("Return status %d\n", ret_status);
+
+	return ret_status;
+}
+#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
+
+void adc_smp_query(void *dm_void, void *output, u32 out_len, u32 *pused)
+{
+	struct dm_struct *dm = (struct dm_struct *)dm_void;
+	struct rt_adcsmp *smp = &dm->adcsmp;
+	struct rt_adcsmp_string *buf = &smp->adc_smp_buf;
+	u32 used = *pused;
+	u32 i = 0;
+#if 0
+	/* struct timespec t; */
+	/* rtw_get_current_timespec(&t); */
+#endif
+
+	pr_debug("%s adc_smp_state %d", __func__, smp->adc_smp_state);
+
+	for (i = 0; i < (buf->length >> 2) - 2; i += 2) {
+		PDM_SNPF(out_len, used, output + used, out_len - used,
+			 "%08x%08x\n", buf->octet[i], buf->octet[i + 1]);
+	}
+
+	PDM_SNPF(out_len, used, output + used, out_len - used, "\n");
+	/* PDM_SNPF(output + used, out_len - used, "\n[%lu.%06lu]\n", */
+	/*	    t.tv_sec, t.tv_nsec); */
+	*pused = used;
+}
+
+s32 adc_smp_get_sample_counts(void *dm_void)
+{
+	struct dm_struct *dm = (struct dm_struct *)dm_void;
+	struct rt_adcsmp *smp = &dm->adcsmp;
+	struct rt_adcsmp_string *buf = &smp->adc_smp_buf;
+
+	return (buf->length >> 2) - 2;
+}
+
+s32 adc_smp_query_single_data(void *dm_void, void *output, u32 out_len, u32 idx)
+{
+	struct dm_struct *dm = (struct dm_struct *)dm_void;
+	struct rt_adcsmp *smp = &dm->adcsmp;
+	struct rt_adcsmp_string *buf = &smp->adc_smp_buf;
+	u32 used = 0;
+
+	/* @dbg_print("%s adc_smp_state %d\n", __func__,*/
+	/*	      smp->adc_smp_state);*/
+	if (smp->adc_smp_state != ADCSMP_STATE_QUERY) {
+		PDM_SNPF(out_len, used, output + used, out_len - used,
+			 "Error: la data is not ready yet ...\n");
+		return -1;
+	}
+
+	if (idx < ((buf->length >> 2) - 2)) {
+		PDM_SNPF(out_len, used, output + used, out_len - used,
+			 "%08x%08x\n", buf->octet[idx], buf->octet[idx + 1]);
+	}
+	return 0;
+}
+#endif
+#endif
+
 #endif /*@endif PHYDM_LA_MODE_SUPPORT*/

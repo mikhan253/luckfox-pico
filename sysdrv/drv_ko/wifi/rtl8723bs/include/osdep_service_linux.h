@@ -56,10 +56,6 @@
 #include <linux/list.h>
 #include <linux/vmalloc.h>
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
-	#include <uapi/linux/sched/types.h>
-#endif
-
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 5, 41))
 	#include <linux/tqueue.h>
 #endif
@@ -126,6 +122,11 @@
 
 #ifdef CONFIG_USB_HCI
 	typedef struct urb   *PURB;
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22))
+		#ifdef CONFIG_USB_SUSPEND
+			#define CONFIG_AUTOSUSPEND	1
+		#endif
+	#endif
 #endif
 
 #if defined(CONFIG_RTW_GRO) && (!defined(CONFIG_RTW_NAPI))
@@ -214,6 +215,18 @@ typedef void *timer_hdl_context;
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
 	#define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
+#endif
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
+/* Porting from linux kernel commits 
+48eab831ae8b9f7002a533fa4235eed63ea1f1a3 
+3f6cffb8604b537e3d7ea040d7f4368689638eaf
+adeef3e32146a8d2a73c399dc6f5d76a449131b1
+*/
+static inline void eth_hw_addr_set(struct net_device *dev, const u8 *addr)
+{
+	memcpy(dev->dev_addr, addr, ETH_ALEN);
+}
 #endif
 
 typedef unsigned long systime;
@@ -383,11 +396,6 @@ __inline static void _set_timer(_timer *ptimer, u32 delay_time)
 __inline static void _cancel_timer(_timer *ptimer, u8 *bcancelled)
 {
 	*bcancelled = del_timer_sync(&ptimer->timer) == 1 ? 1 : 0;
-}
-
-__inline static void _cancel_timer_async(_timer *ptimer)
-{
-	del_timer(&ptimer->timer);
 }
 
 static inline void _init_workitem(_workitem *pwork, void *pfunc, void *cntx)

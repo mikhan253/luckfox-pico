@@ -34,8 +34,8 @@ ifeq ($(ENABLE_WIFI),y)
 endif
 
 build-drivers:
-	#@make -C rtl8723bs/
 	@make -C rtl8189fs/
+	@make -C rtl8723bs/
 	#@make -C hichannel/
 	#@make -C atbm/
 	#@make -C atbm6441/
@@ -45,6 +45,7 @@ build-drivers:
 
 build-drivers-clean:
 	@make -C rtl8189fs/ clean
+	@make -C rtl8723bs/ clean
 	#@make -C bcmdhd/ clean
 	#@make -C hichannel/ clean
 	#@make -C atbm/ clean

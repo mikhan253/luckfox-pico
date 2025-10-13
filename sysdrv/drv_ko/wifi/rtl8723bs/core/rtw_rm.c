@@ -33,20 +33,6 @@ u8 rm_post_event_hdl(_adapter *padapter, u8 *pbuf)
 	return H2C_SUCCESS;
 }
 
-void rm_update_cap(u8 *frame_head, _adapter *pa, u32 pktlen, int offset)
-{
-#ifdef CONFIG_RTW_80211K
-	u8 *res;
-	sint len;
-
-	res = rtw_get_ie(frame_head + offset, _EID_RRM_EN_CAP_IE_, &len,
-			 pktlen - offset);
-	if (res != NULL)
-		_rtw_memcpy((void *)pa->rmpriv.rm_en_cap_def, (res + 2),
-			    MIN(len, sizeof(pa->rmpriv.rm_en_cap_def)));
-#endif
-}
-
 #ifdef CONFIG_RTW_80211K
 struct cmd_meas_type_ {
 	u8 id;
@@ -539,13 +525,13 @@ static int rm_parse_bcn_req_s_elem(struct rm_obj *prm, u8 *pbody, int req_len)
 			RTW_INFO("DBG set ssid to %s\n",DBG_BCN_REQ_SSID_NAME);
 			i = strlen(DBG_BCN_REQ_SSID_NAME);
 			prm->q.opt.bcn.ssid.SsidLength = i;
-			_rtw_memcpy(&(prm->q.opt.bcn.ssid.Ssid), DBG_BCN_REQ_SSID_NAME,
-				MIN(i, sizeof(prm->q.opt.bcn.ssid.Ssid)-1));
+			_rtw_memcpy(&(prm->q.opt.bcn.ssid.Ssid),
+				DBG_BCN_REQ_SSID_NAME, i);
 
 #else /* original */
 			prm->q.opt.bcn.ssid.SsidLength = pbody[p+1];
-			_rtw_memcpy(&(prm->q.opt.bcn.ssid.Ssid), &pbody[p+2],
-				MIN(pbody[p+1], sizeof(prm->q.opt.bcn.ssid.Ssid)-1));
+			_rtw_memcpy(&(prm->q.opt.bcn.ssid.Ssid),
+				&pbody[p+2], pbody[p+1]);
 #endif
 #endif
 
@@ -793,11 +779,8 @@ int rm_recv_radio_mens_rep(_adapter *padapter,
 		| RM_MASTER;
 
 	prm = rm_get_rmobj(padapter, rmid);
-	if (prm == NULL) {
-		/* not belong to us, report to upper */
-		rtw_cfg80211_rx_rrm_action(psta->padapter, precv_frame);
-		return _TRUE;
-	}
+	if (prm == NULL)
+		return _FALSE;
 
 	prm->p.action_code = pdiag_body[1];
 	prm->p.diag_token = pdiag_body[2];
@@ -864,7 +847,7 @@ int rm_recv_link_mens_req(_adapter *padapter,
 
 	RTW_INFO("RM: rmid=%x, bssid" MAC_FMT " rx_pwr=%ddBm, rate=%s\n",
 		prm->rmid, MAC_ARG(prm->psta->cmn.mac_addr), prm->q.rx_pwr,
-		MGN_RATE_STR(prm->q.rx_rate));
+		get_rate_name(prm->q.rx_rate));
 
 #if (RM_MORE_DBG_MSG)
 	RTW_INFO("RM: tx_pwr_used =%d dBm\n", prm->q.tx_pwr_used);
@@ -896,9 +879,8 @@ int rm_recv_link_mens_rep(_adapter *padapter,
 
 	prm = rm_get_rmobj(padapter, rmid);
 	if (prm == NULL) {
-		/* not belong to us, report to upper */
-		rtw_cfg80211_rx_rrm_action(psta->padapter, precv_frame);
-		return _TRUE;
+		RTW_ERR("RM: rmid 0x%08x not found\n", rmid);
+		return ret;
 	}
 
 	RTW_INFO("RM: rmid=%x, bssid " MAC_FMT "\n", prm->rmid,
@@ -940,12 +922,8 @@ int rm_radio_mens_nb_rep(_adapter *padapter,
 		| RM_MASTER;
 
 	prm = rm_get_rmobj(padapter, rmid);
-
-	if (prm == NULL) {
-		/* not belong to us, report to upper */
-		rtw_cfg80211_rx_rrm_action(psta->padapter, precv_frame);
-		return _TRUE;
-	}
+	if (prm == NULL)
+		return _FALSE;
 
 	prm->p.action_code = pdiag_body[1];
 	prm->p.diag_token = pdiag_body[2];
@@ -1258,10 +1236,7 @@ static u8 *rm_gen_bcn_rep_ie (struct rm_obj *prm,
 	pframe = rtw_set_fixed_ie(pframe, 1, &val8, &my_len);
 
 	/* ParentTSF */
-	val32 = pnetwork->network.PhyInfo.free_cnt;
-	if (prm->free_run_counter_valid)
-		val32 += prm->meas_start_time;
-
+	val32 = prm->meas_start_time + pnetwork->network.PhyInfo.free_cnt;
 	pframe = rtw_set_fixed_ie(pframe, 4, (u8 *)&val32, &my_len);
 
 	/* Generate Beacon detail */
@@ -1829,11 +1804,9 @@ int rm_radio_meas_report_cond(struct rm_obj *prm)
 		case ch_load_cond_anpi_equal_greater:
 			if (val8 >= prm->q.opt.clm.rep_cond.threshold)
 				return _SUCCESS;
-			break;
 		case ch_load_cond_anpi_equal_less:
 			if (val8 <= prm->q.opt.clm.rep_cond.threshold)
 				return _SUCCESS;
-			break;
 		default:
 			break;
 		}
@@ -1991,9 +1964,8 @@ void rtw_ap_parse_sta_rm_en_cap(_adapter *padapter,
 	if (elem->rm_en_cap) {
 		RTW_INFO("assoc.rm_en_cap="RM_CAP_FMT"\n",
 			RM_CAP_ARG(elem->rm_en_cap));
-
-		_rtw_memcpy(psta->rm_en_cap, (elem->rm_en_cap),
-			MIN(elem->rm_en_cap_len, sizeof(psta->rm_en_cap)));
+		_rtw_memcpy(psta->rm_en_cap,
+			(elem->rm_en_cap), elem->rm_en_cap_len);
 	}
 }
 
@@ -2001,8 +1973,7 @@ void RM_IE_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE)
 {
 	int i;
 
-	_rtw_memcpy(&padapter->rmpriv.rm_en_cap_assoc, pIE->data,
-		    MIN(pIE->Length, sizeof(padapter->rmpriv.rm_en_cap_assoc)));
+	_rtw_memcpy(&padapter->rmpriv.rm_en_cap_assoc, pIE->data, pIE->Length);
 	RTW_INFO("assoc.rm_en_cap="RM_CAP_FMT"\n", RM_CAP_ARG(pIE->data));
 }
 

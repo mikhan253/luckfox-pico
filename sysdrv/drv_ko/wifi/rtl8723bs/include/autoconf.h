@@ -17,13 +17,22 @@
  */
 #define AUTOCONF_INCLUDED
 
-#define RTL871X_MODULE_NAME "8189FS"
-#define DRV_NAME "rtl8189fs"
+#define RTL871X_MODULE_NAME "8723BU"
+#define DRV_NAME "rtl8723bu"
 
-#ifndef CONFIG_RTL8188F
-#define CONFIG_RTL8188F
+#ifndef CONFIG_RTL8723B
+#define CONFIG_RTL8723B
 #endif
-#define CONFIG_SDIO_HCI
+
+#ifdef CONFIG_USB_HCI
+#undef CONFIG_USB_HCI
+#define CONFIG_USB_HCI	1
+#endif
+
+#ifdef CONFIG_SDIO_HCI
+#undef CONFIG_SDIO_HCI
+#define CONFIG_SDIO_HCI	1
+#endif
 
 #define PLATFORM_LINUX
 
@@ -43,21 +52,23 @@
 	 * RTW_USE_CFG80211_STA_EVENT must be defiend!
 	 */
 	/* #define RTW_USE_CFG80211_STA_EVENT */ /* Indecate new sta asoc through cfg80211_new_sta */
-	#ifndef CONFIG_PLATFORM_INTEL_BYT
 	#define CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER
-	#endif /* !CONFIG_PLATFORM_INTEL_BYT */
 	/* #define CONFIG_DEBUG_CFG80211 */
+	/* #define CONFIG_DRV_ISSUE_PROV_REQ */ /* IOT FOR S2 */
 	#define CONFIG_SET_SCAN_DENY_TIMER
 #endif
 
+#define CONFIG_AP_MODE
 #ifdef CONFIG_AP_MODE
 	#define CONFIG_NATIVEAP_MLME
 	#ifndef CONFIG_NATIVEAP_MLME
 		#define CONFIG_HOSTAPD_MLME
 	#endif
 	/* #define CONFIG_FIND_BEST_CHANNEL */
+	/* #define CONFIG_AUTO_AP_MODE */
 #endif
 
+#define CONFIG_P2P
 #ifdef CONFIG_P2P
 	/* Added by Albert 20110812 */
 	/* The CONFIG_WFD is for supporting the Wi-Fi display */
@@ -85,13 +96,10 @@
 
 /* #define CONFIG_CONCURRENT_MODE */	/* Set from Makefile */
 #ifdef CONFIG_CONCURRENT_MODE
+	#define CONFIG_TSF_RESET_OFFLOAD			/* For 2 PORT TSF SYNC. */
 	#define CONFIG_RUNTIME_PORT_SWITCH
+
 	/* #define DBG_RUNTIME_PORT_SWITCH */
-
-
-	#ifndef CONFIG_RUNTIME_PORT_SWITCH
-		#define CONFIG_TSF_RESET_OFFLOAD			/* For 2 PORT TSF SYNC. */
-	#endif
 #endif /* CONFIG_CONCURRENT_MODE */
 
 #define CONFIG_LAYER2_ROAMING
@@ -100,21 +108,21 @@
 /*
  * Hareware/Firmware Related Config
  */
-/* #define CONFIG_BT_COEXIST */	/* Set from Makefile */
 /* #define CONFIG_ANTENNA_DIVERSITY */
 /* #define SUPPORT_HW_RFOFF_DETECTED */
 
-/*#define CONFIG_RTW_LED*/
+#define CONFIG_RTW_LED
 #ifdef CONFIG_RTW_LED
-	/*#define CONFIG_RTW_SW_LED*/
+	#define CONFIG_RTW_SW_LED
+	#ifdef CONFIG_RTW_SW_LED
+		/* #define CONFIG_RTW_LED_HANDLED_BY_CMD_THREAD */
+	#endif
 #endif /* CONFIG_RTW_LED */
 
 #define CONFIG_XMIT_ACK
 #ifdef CONFIG_XMIT_ACK
 	#define CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 #endif
-
-#define CONFIG_RX_PACKET_APPEND_FCS
 
 #define CONFIG_RF_POWER_TRIM
 
@@ -125,59 +133,98 @@
 /*
  * Interface Related Config
  */
-#define CONFIG_SDIO_CHK_HCI_RESUME
+//usb Interface
+#ifdef CONFIG_USB_HCI
 
-#define CONFIG_SDIO_RX_COPY
-/* #define CONFIG_RECV_THREAD_MODE */
-#ifdef CONFIG_RECV_THREAD_MODE
-#define RTW_RECV_THREAD_HIGH_PRIORITY
-#endif/*CONFIG_RECV_THREAD_MODE*/
-#define CONFIG_SDIO_RECVBUF_AGGREGATION
-#define CONFIG_SDIO_RECVBUF_PWAIT
-#ifdef CONFIG_SDIO_RECVBUF_PWAIT
-#define CONFIG_SDIO_RECVBUF_PWAIT_RUNTIME_ADJUST
+#define CONFIG_USB_TX_AGGREGATION
+#define CONFIG_USB_RX_AGGREGATION
+
+
+#define CONFIG_GLOBAL_UI_PID
+
+#define CONFIG_OUT_EP_WIFI_MODE
+
+#define ENABLE_USB_DROP_INCORRECT_OUT
+
+/* #define CONFIG_SUPPORT_USB_INT */
+#ifdef CONFIG_SUPPORT_USB_INT
+/* #define CONFIG_USB_INTERRUPT_IN_PIPE */
 #endif
 
+/* #define CONFIG_REDUCE_USB_TX_INT */	/* Trade-off: Improve performance, but may cause TX URBs blocked by USB Host/Bus driver on few platforms. */
+
+/*
+ * CONFIG_USE_USB_BUFFER_ALLOC_XX uses Linux USB Buffer alloc API and is for Linux platform only now!
+ */
+/* #define CONFIG_USE_USB_BUFFER_ALLOC_TX */	/* Trade-off: For TX path, improve stability on some platforms, but may cause performance degrade on other platforms. */
+/* #define CONFIG_USE_USB_BUFFER_ALLOC_RX */	/* For RX path */
+
+/*
+ * USB VENDOR REQ BUFFER ALLOCATION METHOD
+ * if not set we'll use function local variable (stack memory)
+ */
+/* #define CONFIG_USB_VENDOR_REQ_BUFFER_DYNAMIC_ALLOCATE */
+#define CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
+#define CONFIG_USB_VENDOR_REQ_MUTEX
+#define CONFIG_VENDOR_REQ_RETRY
+/* #define CONFIG_USB_SUPPORT_ASYNC_VDN_REQ */
+
+#endif
+
+//sdio Interface
+#ifdef CONFIG_SDIO_HCI
+
 #define CONFIG_TX_AGGREGATION
-#define SDIO_FREE_XMIT_BUF_SEMA
+#define CONFIG_SDIO_RX_COPY
 #define CONFIG_XMIT_THREAD_MODE
-#define CONFIG_SDIO_TX_ENABLE_AVAL_INT
+/* #define CONFIG_SDIO_TX_ENABLE_AVAL_INT */
+
+#endif /* CONFIG_SDIO_HCI */
+
 
 /*
  * Others
  */
-/* #define CONFIG_MAC_LOOPBACK_DRIVER */
-
 #define CONFIG_SKB_COPY	/* for amsdu */
+
+/* #define CONFIG_EASY_REPLACEMENT */
+
+/* #define CONFIG_ADAPTOR_INFO_CACHING_FILE */ /* now just applied on 8192cu only, should make it general... */
+
+/* #define CONFIG_RESUME_IN_WORKQUEUE */
+
+/* #define CONFIG_SET_SCAN_DENY_TIMER */
 
 #define CONFIG_NEW_SIGNAL_STAT_PROCESS
 
+/* #define CONFIG_SIGNAL_DISPLAY_DBM */ /* display RX signal with dbm */
+#ifdef CONFIG_SIGNAL_DISPLAY_DBM
+/* #define CONFIG_BACKGROUND_NOISE_MONITOR */
+#endif
+
 #define CONFIG_EMBEDDED_FWIMG
+
 #ifdef CONFIG_EMBEDDED_FWIMG
 	#define	LOAD_FW_HEADER_FROM_DRIVER
 #endif
 /* #define CONFIG_FILE_FWIMG */
 
 #define CONFIG_LONG_DELAY_ISSUE
-/* #define CONFIG_PATCH_JOIN_WRONG_CHANNEL */
 
 
 /*
  * Auto Config Section
  */
-#ifdef CONFIG_MAC_LOOPBACK_DRIVER
-	#undef CONFIG_IOCTL_CFG80211
-	#undef CONFIG_AP_MODE
-	#undef CONFIG_NATIVEAP_MLME
-	#undef CONFIG_POWER_SAVING
-	#undef CONFIG_BT_COEXIST
-	#undef CONFIG_ANTENNA_DIVERSITY
-	#undef SUPPORT_HW_RFOFF_DETECTED
+#ifdef CONFIG_MINIMAL_MEMORY_USAGE
+	#undef CONFIG_USB_TX_AGGREGATION
+	#undef CONFIG_USB_RX_AGGREGATION
 #endif
 
 #ifdef CONFIG_MP_INCLUDED
 	#define MP_DRIVER	1
 	#define CONFIG_MP_IWPRIV_SUPPORT
+	/* #undef CONFIG_USB_TX_AGGREGATION */
+	/* #undef CONFIG_USB_RX_AGGREGATION */
 #else /* !CONFIG_MP_INCLUDED */
 	#define MP_DRIVER	0
 #endif /* !CONFIG_MP_INCLUDED */
@@ -186,41 +233,65 @@
 	#define CONFIG_IPS
 	#define CONFIG_LPS
 
-	#if defined(CONFIG_LPS) && (defined(CONFIG_GSPI_HCI) || defined(CONFIG_SDIO_HCI))
-		#define CONFIG_LPS_LCLK
+	#ifdef CONFIG_IPS
+	/* #define CONFIG_IPS_LEVEL_2	1 */ /* enable this to set default IPS mode to IPS_LEVEL_2 */
 	#endif
 
-	#ifdef CONFIG_LPS
-		#define CONFIG_CHECK_LEAVE_LPS
-		/* #define CONFIG_LPS_SLOW_TRANSITION */
+	#if defined(CONFIG_LPS) && defined(CONFIG_SUPPORT_USB_INT)
+		/* #define CONFIG_LPS_LCLK */
 	#endif
 
 	#ifdef CONFIG_LPS_LCLK
-		#define CONFIG_DETECT_CPWM_BY_POLLING
-		#define CONFIG_LPS_RPWM_TIMER
-		#if defined(CONFIG_LPS_RPWM_TIMER) || defined(CONFIG_DETECT_CPWM_BY_POLLING)
-			#define LPS_RPWM_WAIT_MS 300
-		#endif
-		#define CONFIG_LPS_LCLK_WD_TIMER /* Watch Dog timer in LPS LCLK */
-	#endif
-
-	#ifdef CONFIG_IPS
-		#define CONFIG_IPS_CHECK_IN_WD /* Do IPS Check in WatchDog */
-		/* #define CONFIG_SWLPS_IN_IPS */ /* Do SW LPS flow when entering and leaving IPS */
-		/* #define CONFIG_FWLPS_IN_IPS */ /* issue H2C command to let FW do LPS when entering IPS */
+		/* #define CONFIG_XMIT_THREAD_MODE */
 	#endif
 #endif /* CONFIG_POWER_SAVING */
 
+#ifdef CONFIG_BT_COEXIST
+	/* for ODM and outsrc BT-Coex */
+	#ifndef CONFIG_LPS
+		#define CONFIG_LPS	/* download reserved page to FW */
+	#endif
+#endif /* !CONFIG_BT_COEXIST */
+
 #ifdef CONFIG_WOWLAN
-	#define CONFIG_GTK_OL
-	/* #define CONFIG_ARP_KEEP_ALIVE */
+	/* #define CONFIG_GTK_OL */
 #endif /* CONFIG_WOWLAN */
 
 #ifdef CONFIG_GPIO_WAKEUP
 	#ifndef WAKEUP_GPIO_IDX
-		#define WAKEUP_GPIO_IDX	0
+		#define WAKEUP_GPIO_IDX	14	/* WIFI Chip Side */
+	#endif /* !WAKEUP_GPIO_IDX */
+#endif /* CONFIG_GPIO_WAKEUP */
+
+#ifdef CONFIG_AP_MODE
+	/* #define CONFIG_INTERRUPT_BASED_TXBCN */ /* Tx Beacon when driver BCN_OK ,BCN_ERR interrupt occurs */
+	#if defined(CONFIG_CONCURRENT_MODE) && defined(CONFIG_INTERRUPT_BASED_TXBCN)
+		#undef CONFIG_INTERRUPT_BASED_TXBCN
+	#endif
+	#ifdef CONFIG_INTERRUPT_BASED_TXBCN
+		/* #define CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
+		#define CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
+	#endif
+#endif /* CONFIG_AP_MODE */
+
+#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
+
+#else
+	#define CONFIG_PREALLOC_RECV_SKB
+	#ifdef CONFIG_PREALLOC_RECV_SKB
+		/* #define CONFIG_FIX_NR_BULKIN_BUFFER */ /* only use PREALLOC_RECV_SKB buffer, don't alloc skb at runtime */
 	#endif
 #endif
+
+#ifdef CONFIG_USB_TX_AGGREGATION
+/* #define CONFIG_TX_EARLY_MODE */
+#endif
+
+#ifdef CONFIG_TX_EARLY_MODE
+#define RTL8723B_EARLY_MODE_PKT_NUM_10	0
+#endif
+
+
 
 /*
  * Debug Related Config
@@ -231,10 +302,32 @@
 #define DBG	0	/* for ODM & BTCOEX debug */
 #endif /* CONFIG_RTW_DEBUG */
 
+#define DBG_CHECK_FW_PS_STATE
 #define DBG_CONFIG_ERROR_DETECT
+/* #define DBG_CONFIG_ERROR_DETECT_INT */
+/* #define DBG_CONFIG_ERROR_RESET */
+
+/* #define DBG_IO */
+/* #define DBG_DELAY_OS */
+/* #define DBG_MEM_ALLOC */
+/* #define DBG_IOCTL */
+
+/* #define DBG_TX */
 /* #define DBG_XMIT_BUF */
 /* #define DBG_XMIT_BUF_EXT */
-/* #define DBG_CHECK_FW_PS_STATE */
-/* #define DBG_CHECK_FW_PS_STATE_H2C */
-/* #define CONFIG_FW_C2H_DEBUG */
+/* #define DBG_TX_DROP_FRAME */
+
+/* #define DBG_RX_DROP_FRAME */
+/* #define DBG_RX_SEQ */
+/* #define DBG_RX_SIGNAL_DISPLAY_PROCESSING */
+/* #define DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED "rtw-ap" */
+
+
+/* #define DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE */
+/* #define DBG_ROAMING_TEST */
+
+/* #define DBG_HAL_INIT_PROFILING */
+
+/*#define DBG_MEMORY_LEAK*/
 #define	DBG_RX_DFRAME_RAW_DATA
+/*#define CONFIG_RTW_80211R*/
