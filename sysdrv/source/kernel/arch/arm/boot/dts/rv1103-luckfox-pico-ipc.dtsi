@@ -106,11 +106,11 @@
 
 /*****************************CSI ********************************/
 &csi2_dphy_hw {
-	status = "okay";
+	status = "disabled";
 };
 
 &csi2_dphy0 {
-	status = "okay";
+	status = "disabled";
 
 	ports {
 		#address-cells = <1>;
@@ -174,11 +174,11 @@
 };
 
 &rkcif {
-	status = "okay";
+	status = "disabled";
 };
 
 &rkcif_mipi_lvds {
-	status = "okay";
+	status = "disabled";
 
 	pinctrl-names = "default";
 	pinctrl-0 = <&mipi_pins>;
@@ -191,7 +191,7 @@
 };
 
 &rkcif_mipi_lvds_sditf {
-	status = "okay";
+	status = "disabled";
 
 	port {
 		/* MIPI CSI-2 endpoint */
@@ -202,11 +202,11 @@
 };
 
 &rkisp {
-	status = "okay";
+	status = "disabled";
 };
 
 &rkisp_vir0 {
-	status = "okay";
+	status = "disabled";
 
 	port@0 {
 		isp_in: endpoint {
