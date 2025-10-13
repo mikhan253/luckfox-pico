@@ -3,11 +3,12 @@ ifeq ($(SYSDRV_PARAM), )
 	include $(SYSDRV_PARAM)
 endif
 
-$(SYSDRV_KERNEL_OBJS_OUTPUT_DIR)
-$(KERNEL_DIR)
+BACKPORTDIR := backports-6.1.145-1
 
 all: 
-	cd backports-6.1.145-1 && $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_DIR) M=$(shell pwd) modules O=$(WIFI_BUILD_KERNEL_OBJ_DIR) V=1
+	#cd backports-6.1.145-1 && $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_DIR) M=$(shell pwd) modules O=$(WIFI_BUILD_KERNEL_OBJ_DIR) V=1
+	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C ${KERNEL_DIR} M=$(shell pwd)/$(BACKPORTDIR) modules O=$(KERNEL_DIR)/../objs_kernel V=1
+	
 
 
 clean: $(PKG_CLEAN_TARGET)
